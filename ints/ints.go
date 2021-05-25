@@ -41,22 +41,30 @@ func Range(start, end, step int) []int {
 }
 
 // Returns the maximum of all the given integers.
+//
+// If no numbers are given 0 is returned.
 func Max(numbers... int) (max int) {
-	max = MinInt
-	for _, n := range numbers {
-		if n > max {
-			max = n
+	if len(numbers) > 0 {
+		max = MinInt
+		for _, n := range numbers {
+			if n > max {
+				max = n
+			}
 		}
 	}
 	return max
 }
 
 // Returns the minimum of all the given integers.
+//
+// If no numbers are given 0 is returned.
 func Min(numbers... int) (min int) {
-	min = MaxInt
-	for _, n := range numbers {
-		if n < min {
-			min = n
+	if len(numbers) > 0 {
+		min = MaxInt
+		for _, n := range numbers {
+			if n < min {
+				min = n
+			}
 		}
 	}
 	return min

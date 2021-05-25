@@ -1,6 +1,7 @@
 package strings
 
 import (
+	"github.com/andygello555/gotils/slices"
 	"sort"
 	"strings"
 	"unicode"
@@ -53,10 +54,12 @@ func StripWhitespace(str string) string {
 //
 // Indices are all the character indices with which to replace with the new string. Each occurrence will be replaced by
 // the string new[occCount % len(new)]. Where occCount is the current count of the indices that have been replaced.
+//
+// The indices slice can contain duplicates and doesn't need to be sorted.
 func ReplaceCharIndex(old string, indices []int, new... string) string {
 	if len(indices) > 0 && len(new) > 0 {
-		// Lets sort the indices so that we can pop them in ascending order
-		sort.Ints(indices)
+		// Lets sort the indices and make them unique so that we can pop them in ascending order
+		slices.RemoveDuplicatesAndSort(&indices)
 		// Pop the first element
 		var currIdx int
 		currIdx, indices = indices[0], indices[1:]
@@ -66,7 +69,7 @@ func ReplaceCharIndex(old string, indices []int, new... string) string {
 		for idx, val := range old {
 			if currIdx == idx {
 				// If we have reached an index to replace then write the new string and pop the new idx
-				b.WriteString(new[idx % len(new)])
+				b.WriteString(new[occCount % len(new)])
 				occCount++
 				if len(indices) > 0 {
 					currIdx, indices = indices[0], indices[1:]
@@ -86,12 +89,32 @@ func ReplaceCharIndex(old string, indices []int, new... string) string {
 //
 // The length of new strings must be less than or equal to the length of the indices slice. The length of indices must
 // also be greater than 0. If any of these conditions are not met the old string shall be returned.
+//
+// The indices slice can contain duplicates and doesn't need to be sorted. It's worth bearing in mind that removing the
+// duplicates from the indices slice is O(n^2).
 func ReplaceCharIndexRange(old string, indices [][]int, new... string) string {
 	if len(indices) > 0 && len(new) <= len(indices) {
+		// Remove duplicates from the indices slice
+		// FIXME: Find a more efficient way of doing this. Wrapper for 2D []int with equality?
+		newIndices := make([][]int, 0)
+		for _, ran := range indices {
+			for _, inSet := range newIndices {
+				if ran[0] == inSet[0] && ran[1] == inSet[1] {
+					// We continue onto the next element in indices without appending to newIndices
+					goto skip
+				}
+			}
+			newIndices = append(newIndices, ran)
+			skip:
+				continue
+		}
+		indices = newIndices
+
 		// Sort the indices by ascending end values
 		sort.SliceStable(indices, func(i, j int) bool {
 			return indices[i][1] < indices[j][1]
 		})
+
 		// Pop the first element
 		var currRange []int
 		currRange, indices = indices[0], indices[1:]
