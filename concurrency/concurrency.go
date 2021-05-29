@@ -1,3 +1,4 @@
+// Data-structures and functions to do with concurrency and goroutines.
 package concurrency
 
 // In-Out infinite channels that don't block when written to.

@@ -1,3 +1,4 @@
+// Map functions such as deep copying and equality testing.
 package maps
 
 import (

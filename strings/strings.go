@@ -1,3 +1,4 @@
+// String based data structures and string manipulation functions.
 package strings
 
 import (

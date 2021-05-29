@@ -2,6 +2,22 @@ package slices
 
 import "fmt"
 
+func ExampleSameElements() {
+	// Two slices with the same elements but different orders
+	arr1 := []interface{}{1, 2, 3}
+	arr2 := []interface{}{2, 1, 3}
+	fmt.Printf("SameElements(%v, %v) = %t\n", arr1, arr2, SameElements(arr1, arr2))
+
+	// Two slices with the different elements
+	arr1 = []interface{}{1, 2, 4}
+	arr2 = []interface{}{2, 3, 1}
+	fmt.Printf("SameElements(%v, %v) = %t\n", arr1, arr2, SameElements(arr1, arr2))
+
+	// Output:
+	// SameElements([1 2 3], [2 1 3]) = true
+	// SameElements([1 2 4], [2 3 1]) = false
+}
+
 // Add the given element at the given indices.
 func ExampleAddElems() {
 	arr := []interface{}{1, 2, 3}

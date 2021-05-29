@@ -1,6 +1,39 @@
+// Manipulation of slices.
 package slices
 
-import "sort"
+import (
+	"fmt"
+	"sort"
+)
+
+// Check if two interface slices have the same elements.
+//
+// Unlike reflect.DeepEqual this will not care about order.
+func SameElements(x, y []interface{}) bool {
+	if len(x) != len(y) {
+		return false
+	}
+	// create a map of string -> int
+	diff := make(map[string]int, len(x))
+	for _, _x := range x {
+		// 0 value for int is 0, so just increment a counter for the value
+		diff[fmt.Sprint(_x)]++
+	}
+	for _, _y := range y {
+		// If the string _y is not in diff bail out early
+		if _, ok := diff[fmt.Sprint(_y)]; !ok {
+			return false
+		}
+		diff[fmt.Sprint(_y)] -= 1
+		if diff[fmt.Sprint(_y)] == 0 {
+			delete(diff, fmt.Sprint(_y))
+		}
+	}
+	if len(diff) == 0 {
+		return true
+	}
+	return false
+}
 
 // Remove duplicates and sort an array of integers in place.
 func RemoveDuplicatesAndSort(indices *[]int) {

@@ -1,3 +1,4 @@
+// Functions and constants to do with integers and generating sequences of integers.
 package ints
 
 const (

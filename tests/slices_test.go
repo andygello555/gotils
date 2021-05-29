@@ -169,3 +169,74 @@ func TestRemoveElems(t *testing.T) {
 		}
 	}
 }
+
+func TestSameElements(t *testing.T) {
+	for _, test := range []struct{
+		slice1         []interface{}
+		slice2         []interface{}
+		expectedOutput bool
+	}{
+		{
+			[]interface{}{1, 2, 3},
+			[]interface{}{2, 1, 3},
+			true,
+		},
+		{
+			[]interface{}{1, 2, 3},
+			[]interface{}{1, 2, 3},
+			true,
+		},
+		{
+			[]interface{}{
+				map[string]interface{}{
+					"name": "Jim",
+					"age": 20,
+				},
+				map[string]interface{}{
+					"name": "Bob",
+					"age": 38,
+				},
+			},
+			[]interface{}{
+				map[string]interface{}{
+					"name": "Bob",
+					"age": 38,
+				},
+				map[string]interface{}{
+					"name": "Jim",
+					"age": 20,
+				},
+			},
+			true,
+		},
+		{
+			[]interface{}{
+				map[string]interface{}{
+					"name": "Jim",
+					"age": 20,
+				},
+				map[string]interface{}{
+					"name": "Bob",
+					"age": 38,
+				},
+			},
+			[]interface{}{
+				map[string]interface{}{
+					"name": "Bob",
+					"age": 38,
+				},
+				// Age is not 20
+				map[string]interface{}{
+					"name": "Jim",
+					"age": 21,
+				},
+			},
+			false,
+		},
+	} {
+		actual := slices.SameElements(test.slice1, test.slice2)
+		if actual != test.expectedOutput {
+			t.Errorf("Got: \"%v\", expected: \"%v\"", actual, test.expectedOutput)
+		}
+	}
+}
