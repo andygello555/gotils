@@ -3,6 +3,7 @@ package strings
 
 import (
 	"github.com/andygello555/gotils/slices"
+	"reflect"
 	"sort"
 	"strings"
 	"unicode"
@@ -142,4 +143,14 @@ func ReplaceCharIndexRange(old string, indices [][]int, new... string) string {
 	}
 	// If there is nothing to replace then return the old string
 	return old
+}
+
+// The TypeName of the given interface{}.
+//
+// If i is nil, "<nil>" will be returned.
+func TypeName(i interface{}) string {
+	if i == nil {
+		return "<nil>"
+	}
+	return reflect.TypeOf(i).String()
 }

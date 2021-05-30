@@ -88,3 +88,42 @@ func TestReplaceCharIndexRange(t *testing.T) {
 		}
 	}
 }
+
+func TestTypeName(t *testing.T) {
+	for _, test := range []struct{
+		i              interface{}
+		expectedOutput string
+	}{
+		{
+			"hello world",
+			"string",
+		},
+		{
+			map[string]interface{} {
+				"hello": "world",
+			},
+			"map[string]interface {}",
+		},
+		{
+			10,
+			"int",
+		},
+		{
+			float64(10),
+			"float64",
+		},
+		{
+			[]int{1, 2, 3},
+			"[]int",
+		},
+		{
+			[]string{"hello", "world"},
+			"[]string",
+		},
+	} {
+		typeName := strings.TypeName(test.i)
+		if typeName != test.expectedOutput {
+			t.Errorf("Got: \"%s\", expected: \"%s\"", typeName, test.expectedOutput)
+		}
+	}
+}

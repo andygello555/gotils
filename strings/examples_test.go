@@ -60,3 +60,13 @@ func ExampleStringHeap() {
 	// Orange
 	// Length after: 0
 }
+
+// Get the type name of a string then nil.
+func ExampleTypeName() {
+	val := "hello world"
+	fmt.Printf("The type of \"%v\" is \"%s\"\n", val, TypeName(val))
+	fmt.Printf("Type type of \"%v\" is \"%s\"\n", nil, TypeName(nil))
+	// Output:
+	// The type of "hello world" is "string"
+	// Type type of "<nil>" is "<nil>"
+}
