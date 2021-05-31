@@ -1,5 +1,7 @@
-// Functions and constants to do with integers and generating sequences of integers.
+// Package ints contains functions and constants to do with integers and generating sequences of integers.
 package ints
+
+import "strconv"
 
 const (
 	MaxUint = ^uint(0)
@@ -8,7 +10,7 @@ const (
 	MaxInt = int(MaxUint >> 1)
 )
 
-// Generates an integer array with indices from start to end with the given step value.
+// Range generates an integer array with indices from start to end with the given step value.
 //
 // Returns an empty array if step is equal to 0 or end is less than start and step is a positive number.
 func Range(start, end, step int) []int {
@@ -41,7 +43,7 @@ func Range(start, end, step int) []int {
 	return s
 }
 
-// Returns the maximum of all the given integers.
+// Max returns the maximum of all the given integers.
 //
 // If no numbers are given 0 is returned.
 func Max(numbers... int) (max int) {
@@ -56,7 +58,7 @@ func Max(numbers... int) (max int) {
 	return max
 }
 
-// Returns the minimum of all the given integers.
+// Min returns the minimum of all the given integers.
 //
 // If no numbers are given 0 is returned.
 func Min(numbers... int) (min int) {
@@ -69,4 +71,26 @@ func Min(numbers... int) (min int) {
 		}
 	}
 	return min
+}
+
+// Ordinal gives you the input number in a rank/ordinal format.
+//
+// Ordinal(3) -> 3rd. Straight from the "go-humanize" library: https://github.com/dustin/go-humanize.
+func Ordinal(x int) string {
+	suffix := "th"
+	switch x % 10 {
+	case 1:
+		if x%100 != 11 {
+			suffix = "st"
+		}
+	case 2:
+		if x%100 != 12 {
+			suffix = "nd"
+		}
+	case 3:
+		if x%100 != 13 {
+			suffix = "rd"
+		}
+	}
+	return strconv.Itoa(x) + suffix
 }
