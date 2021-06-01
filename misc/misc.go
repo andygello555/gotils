@@ -1,3 +1,4 @@
+// Package misc contains some miscellaneous functions and constants that don't really fit elsewhere.
 package misc
 
 import "regexp"

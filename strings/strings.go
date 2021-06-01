@@ -1,4 +1,4 @@
-// String based data structures and string manipulation functions.
+// Package strings contains based data structures and string manipulation functions as well as some constants.
 package strings
 
 import (
@@ -9,13 +9,21 @@ import (
 	"unicode"
 )
 
-// A priority queue which sorts strings lexicographically.
+const (
+	AlphaLower   = "abcdefghijklmnopqrstuvwxyz"
+	AlphaUpper   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	Alpha        = AlphaLower + AlphaUpper
+	Numeric      = "1234567890"
+	AlphaNumeric = Alpha + Numeric
+)
+
+// StringHeap is a priority queue which sorts strings lexicographically.
 type StringHeap []string
 
-// The length of the StringHeap.
+// Len gives the length of the StringHeap.
 func (spq StringHeap) Len() int { return len(spq) }
 
-// Compares two string elements in the StringHeap.
+// Less compares two string elements in the StringHeap.
 //
 // Uses strings.Compare internally.
 func (spq StringHeap) Less(i, j int) bool {
@@ -23,15 +31,15 @@ func (spq StringHeap) Less(i, j int) bool {
 	return strings.Compare(spq[i], spq[j]) <= 0
 }
 
-// Swaps the two elements indicated via the given indices.
+// Swap swaps the two elements indicated via the given indices.
 func (spq StringHeap) Swap(i, j int) { spq[i], spq[j] = spq[j], spq[i] }
 
-// Pushes the given interface{} to the heap.
+// Push pushes the given interface{} to the heap.
 //
 // Will panic if given interface{} is not a string.
 func (spq *StringHeap) Push(x interface{}) { *spq = append(*spq, x.(string)) }
 
-// Pops the tail of the queue.
+// Pop pops the tail of the queue.
 func (spq *StringHeap) Pop() interface{} {
 	old := *spq
 	n := len(old)
@@ -40,7 +48,7 @@ func (spq *StringHeap) Pop() interface{} {
 	return str
 }
 
-// Given a string, will strip all whitespace from it and return a new string without any whitespace.
+// StripWhitespace will strip all whitespace from a given string and return a new string without any whitespace.
 func StripWhitespace(str string) string {
 	var b strings.Builder
 	b.Grow(len(str))
@@ -52,7 +60,7 @@ func StripWhitespace(str string) string {
 	return b.String()
 }
 
-// Will replace all characters at the given indices with the new strings. Returns a new string.
+// ReplaceCharIndex will replace all characters at the given indices with the new strings. Returns a new string.
 //
 // Indices are all the character indices with which to replace with the new string. Each occurrence will be replaced by
 // the string new[occCount % len(new)]. Where occCount is the current count of the indices that have been replaced.
@@ -87,7 +95,7 @@ func ReplaceCharIndex(old string, indices []int, new... string) string {
 	return old
 }
 
-// Similar to ReplaceCharIndex but takes multiple index ranges in the form of [start, end].
+// ReplaceCharIndexRange is similar to ReplaceCharIndex but takes multiple index ranges in the form of [start, end].
 //
 // The length of new strings must be less than or equal to the length of the indices slice. The length of indices must
 // also be greater than 0. If any of these conditions are not met the old string shall be returned.
@@ -153,4 +161,34 @@ func TypeName(i interface{}) string {
 		return "<nil>"
 	}
 	return reflect.TypeOf(i).String()
+}
+
+func is(s string, check func(s string) bool) bool {
+	for _, char := range s {
+		if !check(string(char)) {
+			return false
+		}
+	}
+	return true
+}
+
+// IsAlpha checks whether the given string contains only letters.
+func IsAlpha(s string) bool {
+	return is(s, func(s2 string) bool {
+		return strings.Contains(AlphaLower, strings.ToLower(s2))
+	})
+}
+
+// IsNumeric checks whether the given string contains only numbers.
+func IsNumeric(s string) bool {
+	return is(s, func(s2 string) bool {
+		return strings.Contains(Numeric, s2)
+	})
+}
+
+// IsAlphaNumeric checks whether the given string contains only letters and numbers.
+func IsAlphaNumeric(s string) bool {
+	return is(s, func(s2 string) bool {
+		return strings.Contains(AlphaNumeric, s2)
+	})
 }

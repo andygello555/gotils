@@ -70,3 +70,30 @@ func ExampleTypeName() {
 	// The type of "hello world" is "string"
 	// Type type of "<nil>" is "<nil>"
 }
+
+// Checks whether "abc" and "abc?" contain letters only.
+func ExampleIsAlpha() {
+	fmt.Println(IsAlpha("abc"))
+	fmt.Println(IsAlpha("abc?"))
+	// Output:
+	// true
+	// false
+}
+
+// Checks whether "123" and "123abc" contain numbers only.
+func ExampleIsNumeric() {
+	fmt.Println(IsNumeric("123"))
+	fmt.Println(IsNumeric("123abc"))
+	// Output:
+	// true
+	// false
+}
+
+// Checks whether "abc123" and "abc123?!" are alphanumeric strings.
+func ExampleIsAlphaNumeric() {
+	fmt.Println(IsAlphaNumeric("abc123"))
+	fmt.Println(IsAlphaNumeric("abc123?!"))
+	// Output:
+	// true
+	// false
+}
