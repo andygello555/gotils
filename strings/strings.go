@@ -2,6 +2,7 @@
 package strings
 
 import (
+	"bytes"
 	"github.com/andygello555/gotils/slices"
 	"reflect"
 	"sort"
@@ -191,4 +192,41 @@ func IsAlphaNumeric(s string) bool {
 	return is(s, func(s2 string) bool {
 		return strings.Contains(AlphaNumeric, s2)
 	})
+}
+
+// SplitCamelcase splits a string containing camelcase at each hump.
+//
+// For example the following string:
+//  "HelloWorld"
+// Would produce:
+//  {"Hello", "World"}
+func SplitCamelcase(s string) []string {
+	var b bytes.Buffer
+	split := make([]string, 0)
+	priorLower := false
+	for i, v := range s {
+		last := i == len(s) - 1
+		if priorLower && unicode.IsUpper(v) || last {
+			split = append(split, b.String())
+			b.Reset()
+		}
+
+		if !last {
+			b.WriteRune(v)
+		} else {
+			split[len(split) - 1] += string(v)
+		}
+		priorLower = unicode.IsLower(v) || unicode.IsNumber(v)
+	}
+	return split
+}
+
+// JoinCamelcase replaces the hump boundaries of the given camelcase-d string with the given separator.
+//
+// For example joining the following string...
+//  "HelloWorld"
+// ... With ", " , produces:
+//  "Hello, World"
+func JoinCamelcase(s, sep string) string {
+	return strings.Join(SplitCamelcase(s), sep)
 }

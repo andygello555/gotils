@@ -97,3 +97,15 @@ func ExampleIsAlphaNumeric() {
 	// true
 	// false
 }
+
+// Splits a string which is in camelcase at each hump.
+func ExampleSplitCamelcase() {
+	fmt.Println(SplitCamelcase("HelloWorld"))
+	// Output: [Hello World]
+}
+
+// Joins each hump of the camelcase string with the given separator.
+func ExampleJoinCamelcase() {
+	fmt.Println(JoinCamelcase("HelloWorld", ", "))
+	// Output: Hello, World
+}
