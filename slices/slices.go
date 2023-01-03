@@ -6,7 +6,7 @@ import (
 	"sort"
 )
 
-// Check if two interface slices have the same elements.
+// SameElements checks if two interface slices have the same elements.
 //
 // Unlike reflect.DeepEqual this will not care about order.
 func SameElements(x, y []interface{}) bool {
@@ -35,7 +35,7 @@ func SameElements(x, y []interface{}) bool {
 	return false
 }
 
-// Remove duplicates and sort an array of integers in place.
+// RemoveDuplicatesAndSort removes duplicates and sort an array of integers in place.
 func RemoveDuplicatesAndSort(indices *[]int) {
 	actualIndices := make([]int, 0)
 	indexSet := make(map[int]struct{})
@@ -53,19 +53,19 @@ func RemoveDuplicatesAndSort(indices *[]int) {
 	*indices = actualIndices
 }
 
-// Adds the given value at the given indices.
+// AddElems adds the given value at the given indices.
 //
 // If there is an index which exceeds the length of the given slice plus the number of unique indices given then this
-// will result in an new array that's the length of the maximum index in indices. If this happens then any "empty"
+// will result in a new array that's the length of the maximum index in indices. If this happens then any "empty"
 // space will be filled by default by "nil".
-func AddElems(slice []interface{}, value interface{}, indices... int) []interface{} {
+func AddElems(slice []interface{}, value interface{}, indices ...int) []interface{} {
 	RemoveDuplicatesAndSort(&indices)
 	// Find the bounds of the new array which will contain the appended value. This is either:
 	// 1. The maximum index: when it exceeds the limits of the new array which will be the length of the slice plus the number of indices
 	// 2. The length of the slice plus the number of indices: otherwise
 	var high int
-	if indices[len(indices) - 1] + 1 > len(slice) + len(indices) {
-		high = indices[len(indices) - 1] + 1
+	if indices[len(indices)-1]+1 > len(slice)+len(indices) {
+		high = indices[len(indices)-1] + 1
 	} else {
 		high = len(slice) + len(indices)
 	}
@@ -86,18 +86,18 @@ func AddElems(slice []interface{}, value interface{}, indices... int) []interfac
 			offset += 1
 			continue
 		}
-		if i - offset < len(slice) {
-			newArr[i] = slice[i - offset]
+		if i-offset < len(slice) {
+			newArr[i] = slice[i-offset]
 		}
 	}
 	return newArr
 }
 
-// Removes the elements at the given indices in the given interface slice and returns a new slice.
+// RemoveElems removes the elements at the given indices in the given interface slice and returns a new slice.
 //
 // The new array will have a length which is the difference between the length of the given slice and the length of the
 // given indices as a unique set.
-func RemoveElems(slice []interface{}, indices... int) []interface{} {
+func RemoveElems(slice []interface{}, indices ...int) []interface{} {
 	RemoveDuplicatesAndSort(&indices)
 	out := make([]interface{}, 0)
 	// Simple priority queue structure
@@ -112,6 +112,19 @@ func RemoveElems(slice []interface{}, indices... int) []interface{} {
 			continue
 		}
 		out = append(out, elem)
+	}
+	return out
+}
+
+// Comprehension takes a list of elements of any type and runs the given function on each element to construct a new
+// list with elements of the given type.
+//
+// The first parameter of the function is the index of the currently iterated element, the second is the currently
+// iterated element's value, and the last is the input array in full.
+func Comprehension[IE any, OE any](s []IE, fun func(idx int, value IE, arr []IE) OE) []OE {
+	out := make([]OE, len(s))
+	for i, ie := range s {
+		out[i] = fun(i, ie, s)
 	}
 	return out
 }

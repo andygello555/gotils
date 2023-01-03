@@ -16,13 +16,13 @@ func exists(path string) (mode os.FileMode, exists bool) {
 	return fi.Mode(), !os.IsNotExist(err)
 }
 
-// Returns whether the given path exists regardless of what mode the pointed to file has.
+// Exists returns whether the given path exists regardless of what mode the pointed to file has.
 func Exists(path string) bool {
 	_, exists := exists(path)
 	return exists
 }
 
-// Checks if the given path exists and whether the path points to a file.
+// IsFile checks if the given path exists and whether the path points to a file.
 //
 // Returns true if the path exists and the path points to a file, otherwise false.
 func IsFile(path string) bool {
@@ -30,7 +30,7 @@ func IsFile(path string) bool {
 	return exists && !mode.IsDir()
 }
 
-// Checks if the given path exists a directory.
+// IsDir checks if the given path exists and is a directory.
 //
 // Returns true if the path given exists and it points to a directory, false otherwise.
 func IsDir(path string) bool {

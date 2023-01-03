@@ -1,4 +1,4 @@
-// Map functions such as deep copying and equality testing.
+// Package maps contains functions related to maps such as deep copying and equality testing.
 package maps
 
 import (
@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-// Clones a map deeply using recursion.
+// CopyMap clones a map deeply using recursion.
 func CopyMap(m map[string]interface{}) map[string]interface{} {
 	cp := make(map[string]interface{})
 	for k, v := range m {
@@ -23,7 +23,7 @@ func CopyMap(m map[string]interface{}) map[string]interface{} {
 	return cp
 }
 
-// Used in tests to check equality between two interface{}s.
+// JsonMapEqualTest used in tests to check equality between two interface{}s.
 //
 // This takes into account orderings of slices.
 func JsonMapEqualTest(t *testing.T, actual, expected interface{}, forString string) {

@@ -1,7 +1,7 @@
-// Data-structures and functions to do with concurrency and goroutines.
+// Package concurrency contains data-structures and functions to do with concurrency and goroutines.
 package concurrency
 
-// In-Out infinite channels that don't block when written to.
+// InOut creates infinite channels that don't block when written to.
 //
 // This is from https://medium.com/capital-one-tech/building-an-unbounded-channel-in-go-789e175cd2cd.
 func InOut() (chan<- interface{}, <-chan interface{}) {
@@ -21,7 +21,7 @@ func InOut() (chan<- interface{}, <-chan interface{}) {
 		}
 
 		// Returns the head of the input queue if the queue is not empty otherwise it returns nil
-		curVal := func() interface {} {
+		curVal := func() interface{} {
 			if len(inQueue) == 0 {
 				return nil
 			}

@@ -44,3 +44,17 @@ func ExampleRemoveElems() {
 	// Before: [1 2 3 4 5]
 	// After: [1 4]
 }
+
+// Perform list comprehension on a given array/slice.
+func ExampleComprehension() {
+	intArr := []int{1, 2, 3, 4, 5}
+	fmt.Println("Before:", intArr)
+
+	strArr := Comprehension[int, string](intArr, func(idx int, value int, arr []int) string {
+		return fmt.Sprintf("%d", idx*value)
+	})
+	fmt.Println("After:", strArr)
+	// Output:
+	// Before: [1 2 3 4 5]
+	// After: [0 2 6 12 20]
+}
