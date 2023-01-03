@@ -1,4 +1,4 @@
-module github.com/andygello555/gotils
+module github.com/andygello555/gotils/v2
 
 go 1.18
 

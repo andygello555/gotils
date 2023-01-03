@@ -1,13 +1,13 @@
 package tests
 
 import (
-	"github.com/andygello555/gotils/slices"
+	"github.com/andygello555/gotils/v2/slices"
 	"reflect"
 	"testing"
 )
 
 func TestRemoveDuplicatesAndSort(t *testing.T) {
-	for _, test := range []struct{
+	for _, test := range []struct {
 		input          []int
 		expectedOutput []int
 	}{
@@ -36,7 +36,7 @@ func TestRemoveDuplicatesAndSort(t *testing.T) {
 }
 
 func TestAddElems(t *testing.T) {
-	for _, test := range []struct{
+	for _, test := range []struct {
 		slice          []interface{}
 		value          interface{}
 		indices        []int
@@ -58,8 +58,8 @@ func TestAddElems(t *testing.T) {
 			[]interface{}{
 				map[string]interface{}{
 					"name": "Bob",
-					"age": 29,
-					"egg": true,
+					"age":  29,
+					"egg":  true,
 				},
 				[]interface{}{
 					"Jill",
@@ -82,8 +82,8 @@ func TestAddElems(t *testing.T) {
 				},
 				map[string]interface{}{
 					"name": "Bob",
-					"age": 29,
-					"egg": true,
+					"age":  29,
+					"egg":  true,
 				},
 				map[string]string{
 					"hello": "world",
@@ -117,7 +117,7 @@ func TestAddElems(t *testing.T) {
 }
 
 func TestRemoveElems(t *testing.T) {
-	for _, test := range []struct{
+	for _, test := range []struct {
 		slice          []interface{}
 		indices        []int
 		expectedOutput []interface{}
@@ -136,8 +136,8 @@ func TestRemoveElems(t *testing.T) {
 			[]interface{}{
 				map[string]interface{}{
 					"name": "Bob",
-					"age": 29,
-					"egg": true,
+					"age":  29,
+					"egg":  true,
 				},
 				[]interface{}{
 					"Jill",
@@ -151,8 +151,8 @@ func TestRemoveElems(t *testing.T) {
 			[]interface{}{
 				map[string]interface{}{
 					"name": "Bob",
-					"age": 29,
-					"egg": true,
+					"age":  29,
+					"egg":  true,
 				},
 				"Sarah",
 			},
@@ -171,7 +171,7 @@ func TestRemoveElems(t *testing.T) {
 }
 
 func TestSameElements(t *testing.T) {
-	for _, test := range []struct{
+	for _, test := range []struct {
 		slice1         []interface{}
 		slice2         []interface{}
 		expectedOutput bool
@@ -190,21 +190,21 @@ func TestSameElements(t *testing.T) {
 			[]interface{}{
 				map[string]interface{}{
 					"name": "Jim",
-					"age": 20,
+					"age":  20,
 				},
 				map[string]interface{}{
 					"name": "Bob",
-					"age": 38,
+					"age":  38,
 				},
 			},
 			[]interface{}{
 				map[string]interface{}{
 					"name": "Bob",
-					"age": 38,
+					"age":  38,
 				},
 				map[string]interface{}{
 					"name": "Jim",
-					"age": 20,
+					"age":  20,
 				},
 			},
 			true,
@@ -213,22 +213,22 @@ func TestSameElements(t *testing.T) {
 			[]interface{}{
 				map[string]interface{}{
 					"name": "Jim",
-					"age": 20,
+					"age":  20,
 				},
 				map[string]interface{}{
 					"name": "Bob",
-					"age": 38,
+					"age":  38,
 				},
 			},
 			[]interface{}{
 				map[string]interface{}{
 					"name": "Bob",
-					"age": 38,
+					"age":  38,
 				},
 				// Age is not 20
 				map[string]interface{}{
 					"name": "Jim",
-					"age": 21,
+					"age":  21,
 				},
 			},
 			false,

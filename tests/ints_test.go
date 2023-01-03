@@ -1,13 +1,13 @@
 package tests
 
 import (
-	"github.com/andygello555/gotils/ints"
+	"github.com/andygello555/gotils/v2/ints"
 	"reflect"
 	"testing"
 )
 
 func TestRange(t *testing.T) {
-	for _, test := range []struct{
+	for _, test := range []struct {
 		start          int
 		end            int
 		step           int
@@ -76,7 +76,7 @@ func TestRange(t *testing.T) {
 }
 
 func TestMax(t *testing.T) {
-	for _, test := range []struct{
+	for _, test := range []struct {
 		input          []int
 		expectedOutput int
 	}{
@@ -109,7 +109,7 @@ func TestMax(t *testing.T) {
 }
 
 func TestMin(t *testing.T) {
-	for _, test := range []struct{
+	for _, test := range []struct {
 		input          []int
 		expectedOutput int
 	}{

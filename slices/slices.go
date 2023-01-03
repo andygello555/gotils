@@ -1,4 +1,4 @@
-// Manipulation of slices.
+// Package slices contains helpers for the manipulation of slices.
 package slices
 
 import (

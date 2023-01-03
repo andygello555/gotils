@@ -1,12 +1,12 @@
 package tests
 
 import (
-	"github.com/andygello555/gotils/strings"
+	"github.com/andygello555/gotils/v2/strings"
 	"testing"
 )
 
 func TestReplaceCharIndex(t *testing.T) {
-	for _, test := range []struct{
+	for _, test := range []struct {
 		old            string
 		indices        []int
 		new            []string
@@ -45,7 +45,7 @@ func TestReplaceCharIndex(t *testing.T) {
 }
 
 func TestReplaceCharIndexRange(t *testing.T) {
-	for _, test := range []struct{
+	for _, test := range []struct {
 		old            string
 		indices        [][]int
 		new            []string
@@ -90,7 +90,7 @@ func TestReplaceCharIndexRange(t *testing.T) {
 }
 
 func TestTypeName(t *testing.T) {
-	for _, test := range []struct{
+	for _, test := range []struct {
 		i              interface{}
 		expectedOutput string
 	}{
@@ -99,7 +99,7 @@ func TestTypeName(t *testing.T) {
 			"string",
 		},
 		{
-			map[string]interface{} {
+			map[string]interface{}{
 				"hello": "world",
 			},
 			"map[string]interface {}",

@@ -3,7 +3,7 @@ package strings
 
 import (
 	"bytes"
-	"github.com/andygello555/gotils/slices"
+	"github.com/andygello555/gotils/v2/slices"
 	"reflect"
 	"sort"
 	"strings"
@@ -67,7 +67,7 @@ func StripWhitespace(str string) string {
 // the string new[occCount % len(new)]. Where occCount is the current count of the indices that have been replaced.
 //
 // The indices slice can contain duplicates and doesn't need to be sorted.
-func ReplaceCharIndex(old string, indices []int, new... string) string {
+func ReplaceCharIndex(old string, indices []int, new ...string) string {
 	if len(indices) > 0 && len(new) > 0 {
 		// Lets sort the indices and make them unique so that we can pop them in ascending order
 		slices.RemoveDuplicatesAndSort(&indices)
@@ -80,7 +80,7 @@ func ReplaceCharIndex(old string, indices []int, new... string) string {
 		for idx, val := range old {
 			if currIdx == idx {
 				// If we have reached an index to replace then write the new string and pop the new idx
-				b.WriteString(new[occCount % len(new)])
+				b.WriteString(new[occCount%len(new)])
 				occCount++
 				if len(indices) > 0 {
 					currIdx, indices = indices[0], indices[1:]
@@ -103,7 +103,7 @@ func ReplaceCharIndex(old string, indices []int, new... string) string {
 //
 // The indices slice can contain duplicates and doesn't need to be sorted. It's worth bearing in mind that removing the
 // duplicates from the indices slice is O(n^2).
-func ReplaceCharIndexRange(old string, indices [][]int, new... string) string {
+func ReplaceCharIndexRange(old string, indices [][]int, new ...string) string {
 	if len(indices) > 0 && len(new) <= len(indices) {
 		// Remove duplicates from the indices slice
 		// FIXME: Find a more efficient way of doing this. Wrapper for 2D []int with equality?
@@ -116,8 +116,8 @@ func ReplaceCharIndexRange(old string, indices [][]int, new... string) string {
 				}
 			}
 			newIndices = append(newIndices, ran)
-			skip:
-				continue
+		skip:
+			continue
 		}
 		indices = newIndices
 
@@ -136,7 +136,7 @@ func ReplaceCharIndexRange(old string, indices [][]int, new... string) string {
 		for idx < len(old) {
 			if idx == currRange[0] {
 				// Write the new string if we have just stumbled upon the start of the current range
-				b.WriteString(new[idxCount % len(new)])
+				b.WriteString(new[idxCount%len(new)])
 				idxCount++
 				idx += currRange[1] - currRange[0]
 				// Pop the new range if we still can
@@ -197,15 +197,18 @@ func IsAlphaNumeric(s string) bool {
 // SplitCamelcase splits a string containing camelcase at each hump.
 //
 // For example the following string:
-//  "HelloWorld"
+//
+//	"HelloWorld"
+//
 // Would produce:
-//  {"Hello", "World"}
+//
+//	{"Hello", "World"}
 func SplitCamelcase(s string) []string {
 	var b bytes.Buffer
 	split := make([]string, 0)
 	priorLower := false
 	for i, v := range s {
-		last := i == len(s) - 1
+		last := i == len(s)-1
 		if priorLower && unicode.IsUpper(v) || last {
 			split = append(split, b.String())
 			b.Reset()
@@ -214,7 +217,7 @@ func SplitCamelcase(s string) []string {
 		if !last {
 			b.WriteRune(v)
 		} else {
-			split[len(split) - 1] += string(v)
+			split[len(split)-1] += string(v)
 		}
 		priorLower = unicode.IsLower(v) || unicode.IsNumber(v)
 	}
@@ -224,9 +227,12 @@ func SplitCamelcase(s string) []string {
 // JoinCamelcase replaces the hump boundaries of the given camelcase-d string with the given separator.
 //
 // For example joining the following string...
-//  "HelloWorld"
+//
+//	"HelloWorld"
+//
 // ... With ", " , produces:
-//  "Hello, World"
+//
+//	"Hello, World"
 func JoinCamelcase(s, sep string) string {
 	return strings.Join(SplitCamelcase(s), sep)
 }

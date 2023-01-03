@@ -1,4 +1,4 @@
-// A convenience wrapper for file checks and operations using paths.
+// Package files is a wrapper for file checks and operations using paths.
 package files
 
 import (
