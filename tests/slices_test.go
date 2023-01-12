@@ -37,31 +37,31 @@ func TestRemoveDuplicatesAndSort(t *testing.T) {
 
 func TestAddElems(t *testing.T) {
 	for _, test := range []struct {
-		slice          []interface{}
-		value          interface{}
+		slice          []any
+		value          any
 		indices        []int
-		expectedOutput []interface{}
+		expectedOutput []any
 	}{
 		{
-			[]interface{}{"hello", "world", "insert", "here", "->", "<-", "nice"},
+			[]any{"hello", "world", "insert", "here", "->", "<-", "nice"},
 			": )",
 			[]int{5},
-			[]interface{}{"hello", "world", "insert", "here", "->", ": )", "<-", "nice"},
+			[]any{"hello", "world", "insert", "here", "->", ": )", "<-", "nice"},
 		},
 		{
-			[]interface{}{1, 2, 3},
+			[]any{1, 2, 3},
 			0,
 			[]int{0, 0, 3, 7, 1},
-			[]interface{}{0, 0, 1, 0, 2, 3, nil, 0},
+			[]any{0, 0, 1, 0, 2, 3, nil, 0},
 		},
 		{
-			[]interface{}{
-				map[string]interface{}{
+			[]any{
+				map[string]any{
 					"name": "Bob",
 					"age":  29,
 					"egg":  true,
 				},
-				[]interface{}{
+				[]any{
 					"Jill",
 					"Bill",
 					"Tom",
@@ -73,14 +73,14 @@ func TestAddElems(t *testing.T) {
 				"hello": "world",
 			},
 			[]int{0, 1, 3, 9, 3, 1},
-			[]interface{}{
+			[]any{
 				map[string]string{
 					"hello": "world",
 				},
 				map[string]string{
 					"hello": "world",
 				},
-				map[string]interface{}{
+				map[string]any{
 					"name": "Bob",
 					"age":  29,
 					"egg":  true,
@@ -88,7 +88,7 @@ func TestAddElems(t *testing.T) {
 				map[string]string{
 					"hello": "world",
 				},
-				[]interface{}{
+				[]any{
 					"Jill",
 					"Bill",
 					"Tom",
@@ -103,10 +103,10 @@ func TestAddElems(t *testing.T) {
 			},
 		},
 		{
-			[]interface{}{1, 2, 3},
+			[]any{1, 2, 3},
 			4,
 			[]int{3},
-			[]interface{}{1, 2, 3, 4},
+			[]any{1, 2, 3, 4},
 		},
 	} {
 		newSlice := slices.AddElems(test.slice, test.value, test.indices...)
@@ -118,28 +118,28 @@ func TestAddElems(t *testing.T) {
 
 func TestRemoveElems(t *testing.T) {
 	for _, test := range []struct {
-		slice          []interface{}
+		slice          []any
 		indices        []int
-		expectedOutput []interface{}
+		expectedOutput []any
 	}{
 		{
-			[]interface{}{"hello", "world", "delete", "->", "this", "<-", "nice"},
+			[]any{"hello", "world", "delete", "->", "this", "<-", "nice"},
 			[]int{4},
-			[]interface{}{"hello", "world", "delete", "->", "<-", "nice"},
+			[]any{"hello", "world", "delete", "->", "<-", "nice"},
 		},
 		{
-			[]interface{}{1, 2, 3},
+			[]any{1, 2, 3},
 			[]int{0, 0, 2},
-			[]interface{}{2},
+			[]any{2},
 		},
 		{
-			[]interface{}{
-				map[string]interface{}{
+			[]any{
+				map[string]any{
 					"name": "Bob",
 					"age":  29,
 					"egg":  true,
 				},
-				[]interface{}{
+				[]any{
 					"Jill",
 					"Bill",
 					"Tom",
@@ -148,8 +148,8 @@ func TestRemoveElems(t *testing.T) {
 				"John",
 			},
 			[]int{1, 3, 3, 1},
-			[]interface{}{
-				map[string]interface{}{
+			[]any{
+				map[string]any{
 					"name": "Bob",
 					"age":  29,
 					"egg":  true,
@@ -158,9 +158,9 @@ func TestRemoveElems(t *testing.T) {
 			},
 		},
 		{
-			[]interface{}{1, 2, 3},
+			[]any{1, 2, 3},
 			[]int{2},
-			[]interface{}{1, 2},
+			[]any{1, 2},
 		},
 	} {
 		newSlice := slices.RemoveElems(test.slice, test.indices...)
@@ -172,37 +172,37 @@ func TestRemoveElems(t *testing.T) {
 
 func TestSameElements(t *testing.T) {
 	for _, test := range []struct {
-		slice1         []interface{}
-		slice2         []interface{}
+		slice1         []any
+		slice2         []any
 		expectedOutput bool
 	}{
 		{
-			[]interface{}{1, 2, 3},
-			[]interface{}{2, 1, 3},
+			[]any{1, 2, 3},
+			[]any{2, 1, 3},
 			true,
 		},
 		{
-			[]interface{}{1, 2, 3},
-			[]interface{}{1, 2, 3},
+			[]any{1, 2, 3},
+			[]any{1, 2, 3},
 			true,
 		},
 		{
-			[]interface{}{
-				map[string]interface{}{
+			[]any{
+				map[string]any{
 					"name": "Jim",
 					"age":  20,
 				},
-				map[string]interface{}{
+				map[string]any{
 					"name": "Bob",
 					"age":  38,
 				},
 			},
-			[]interface{}{
-				map[string]interface{}{
+			[]any{
+				map[string]any{
 					"name": "Bob",
 					"age":  38,
 				},
-				map[string]interface{}{
+				map[string]any{
 					"name": "Jim",
 					"age":  20,
 				},
@@ -210,23 +210,23 @@ func TestSameElements(t *testing.T) {
 			true,
 		},
 		{
-			[]interface{}{
-				map[string]interface{}{
+			[]any{
+				map[string]any{
 					"name": "Jim",
 					"age":  20,
 				},
-				map[string]interface{}{
+				map[string]any{
 					"name": "Bob",
 					"age":  38,
 				},
 			},
-			[]interface{}{
-				map[string]interface{}{
+			[]any{
+				map[string]any{
 					"name": "Bob",
 					"age":  38,
 				},
 				// Age is not 20
-				map[string]interface{}{
+				map[string]any{
 					"name": "Jim",
 					"age":  21,
 				},

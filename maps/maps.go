@@ -9,10 +9,10 @@ import (
 )
 
 // CopyMap clones a map deeply using recursion.
-func CopyMap(m map[string]interface{}) map[string]interface{} {
-	cp := make(map[string]interface{})
+func CopyMap(m map[string]any) map[string]any {
+	cp := make(map[string]any)
 	for k, v := range m {
-		vm, ok := v.(map[string]interface{})
+		vm, ok := v.(map[string]any)
 		if ok {
 			cp[k] = CopyMap(vm)
 		} else {
@@ -23,10 +23,10 @@ func CopyMap(m map[string]interface{}) map[string]interface{} {
 	return cp
 }
 
-// JsonMapEqualTest used in tests to check equality between two interface{}s.
+// JsonMapEqualTest used in tests to check equality between two anys.
 //
 // This takes into account orderings of slices.
-func JsonMapEqualTest(t *testing.T, actual, expected interface{}, forString string) {
+func JsonMapEqualTest(t *testing.T, actual, expected any, forString string) {
 	if diff := deep.Equal(actual, expected); diff != nil {
 		var errB strings.Builder
 		errB.WriteString(fmt.Sprintf("Difference between actual and expected for %s (Left = Actual, Right = Expected)\n", forString))

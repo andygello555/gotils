@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"github.com/andygello555/gotils/v2/ints"
+	"github.com/andygello555/gotils/v2/numbers"
 	"reflect"
 	"testing"
 )
@@ -68,7 +68,7 @@ func TestRange(t *testing.T) {
 			[]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 		},
 	} {
-		r := ints.Range(test.start, test.end, test.step)
+		r := numbers.Range(test.start, test.end, test.step)
 		if !reflect.DeepEqual(r, test.expectedOutput) {
 			t.Errorf("Start = \"%v\", End = \"%v\", Step = \"%v\"\nExpected range: \"%v\"\nGot: \"%v\"", test.start, test.end, test.step, test.expectedOutput, r)
 		}
@@ -101,7 +101,7 @@ func TestMax(t *testing.T) {
 			100,
 		},
 	} {
-		max := ints.Max(test.input...)
+		max := numbers.Max(test.input...)
 		if max != test.expectedOutput {
 			t.Errorf("Got: \"%v\", expected: \"%v\"", max, test.expectedOutput)
 		}
@@ -134,7 +134,7 @@ func TestMin(t *testing.T) {
 			100,
 		},
 	} {
-		max := ints.Min(test.input...)
+		max := numbers.Min(test.input...)
 		if max != test.expectedOutput {
 			t.Errorf("Got: \"%v\", expected: \"%v\"", max, test.expectedOutput)
 		}

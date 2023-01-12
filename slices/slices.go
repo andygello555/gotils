@@ -9,7 +9,7 @@ import (
 // SameElements checks if two interface slices have the same elements.
 //
 // Unlike reflect.DeepEqual this will not care about order.
-func SameElements(x, y []interface{}) bool {
+func SameElements(x, y []any) bool {
 	if len(x) != len(y) {
 		return false
 	}
@@ -58,7 +58,7 @@ func RemoveDuplicatesAndSort(indices *[]int) {
 // If there is an index which exceeds the length of the given slice plus the number of unique indices given then this
 // will result in a new array that's the length of the maximum index in indices. If this happens then any "empty"
 // space will be filled by default by "nil".
-func AddElems(slice []interface{}, value interface{}, indices ...int) []interface{} {
+func AddElems(slice []any, value any, indices ...int) []any {
 	RemoveDuplicatesAndSort(&indices)
 	// Find the bounds of the new array which will contain the appended value. This is either:
 	// 1. The maximum index: when it exceeds the limits of the new array which will be the length of the slice plus the number of indices
@@ -70,7 +70,7 @@ func AddElems(slice []interface{}, value interface{}, indices ...int) []interfac
 		high = len(slice) + len(indices)
 	}
 	// Construct a new array from the specifications above
-	newArr := make([]interface{}, high)
+	newArr := make([]any, high)
 	offset := 0
 
 	var currIdx int
@@ -97,9 +97,9 @@ func AddElems(slice []interface{}, value interface{}, indices ...int) []interfac
 //
 // The new array will have a length which is the difference between the length of the given slice and the length of the
 // given indices as a unique set.
-func RemoveElems(slice []interface{}, indices ...int) []interface{} {
+func RemoveElems(slice []any, indices ...int) []any {
 	RemoveDuplicatesAndSort(&indices)
-	out := make([]interface{}, 0)
+	out := make([]any, 0)
 	// Simple priority queue structure
 	var currIdx int
 	currIdx, indices = indices[0], indices[1:]
@@ -127,4 +127,18 @@ func Comprehension[IE any, OE any](s []IE, fun func(idx int, value IE, arr []IE)
 		out[i] = fun(i, ie, s)
 	}
 	return out
+}
+
+// Reverse reverses a slice in-place.
+func Reverse[IE any](s []IE) {
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		s[i], s[j] = s[j], s[i]
+	}
+}
+
+// ReverseOut reverses a slice in-place, then returns a reference to the slice so that it can be nested within other
+// functions.
+func ReverseOut[IE any](s []IE) []IE {
+	Reverse(s)
+	return s
 }

@@ -19,7 +19,7 @@ func ExampleInOut() {
 		for v := range out {
 			vi := v.(int)
 			fmt.Println("Reading:", vi)
-			if lastVal + 1 != vi {
+			if lastVal+1 != vi {
 				panic("sequence is out of order")
 			}
 			lastVal = vi

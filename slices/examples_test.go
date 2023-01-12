@@ -1,16 +1,19 @@
 package slices
 
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+)
 
 func ExampleSameElements() {
 	// Two slices with the same elements but different orders
-	arr1 := []interface{}{1, 2, 3}
-	arr2 := []interface{}{2, 1, 3}
+	arr1 := []any{1, 2, 3}
+	arr2 := []any{2, 1, 3}
 	fmt.Printf("SameElements(%v, %v) = %t\n", arr1, arr2, SameElements(arr1, arr2))
 
 	// Two slices with the different elements
-	arr1 = []interface{}{1, 2, 4}
-	arr2 = []interface{}{2, 3, 1}
+	arr1 = []any{1, 2, 4}
+	arr2 = []any{2, 3, 1}
 	fmt.Printf("SameElements(%v, %v) = %t\n", arr1, arr2, SameElements(arr1, arr2))
 
 	// Output:
@@ -20,7 +23,7 @@ func ExampleSameElements() {
 
 // Add the given element at the given indices.
 func ExampleAddElems() {
-	arr := []interface{}{1, 2, 3}
+	arr := []any{1, 2, 3}
 	fmt.Println("Before:", arr)
 
 	// All duplicate indices will be removed.
@@ -34,7 +37,7 @@ func ExampleAddElems() {
 
 // Remove the given indices from an array.
 func ExampleRemoveElems() {
-	arr := []interface{}{1, 2, 3, 4, 5}
+	arr := []any{1, 2, 3, 4, 5}
 	fmt.Println("Before:", arr)
 
 	// All duplicate indices will be removed.
@@ -45,7 +48,8 @@ func ExampleRemoveElems() {
 	// After: [1 4]
 }
 
-// Perform list comprehension on a given array/slice.
+// Multiplies a list of integers by their relative index, then converts the resulting integer to its string
+// representation.
 func ExampleComprehension() {
 	intArr := []int{1, 2, 3, 4, 5}
 	fmt.Println("Before:", intArr)
@@ -57,4 +61,31 @@ func ExampleComprehension() {
 	// Output:
 	// Before: [1 2 3 4 5]
 	// After: [0 2 6 12 20]
+}
+
+// Reverses a slice of integers in-place.
+func ExampleReverse() {
+	intArr := []int{1, 2, 3, 4, 5}
+	fmt.Println("Before:", intArr)
+	Reverse(intArr)
+	fmt.Println("After:", intArr)
+	// Output:
+	// Before: [1 2 3 4 5]
+	// After: [5 4 3 2 1]
+}
+
+// Reverses a slice of integers, then converts it to a slice of float64s.
+func ExampleReverseOut() {
+	intArr := []int{1, 2, 3, 4, 5}
+	fmt.Printf("Before (intArr): %v, type = %s\n", intArr, reflect.TypeOf(intArr).String())
+	// ReverseOut returns a reference to the slice so that it can be nested.
+	floatArr := Comprehension(ReverseOut(intArr), func(idx int, value int, arr []int) float64 {
+		return float64(value)
+	})
+	fmt.Printf("After (intArr): %v, type = %s\n", intArr, reflect.TypeOf(intArr).String())
+	fmt.Printf("After (floatArr): %v, type = %s\n", floatArr, reflect.TypeOf(floatArr).String())
+	// Output:
+	// Before (intArr): [1 2 3 4 5], type = []int
+	// After (intArr): [5 4 3 2 1], type = []int
+	// After (floatArr): [5 4 3 2 1], type = []float64
 }

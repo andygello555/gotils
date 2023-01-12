@@ -35,13 +35,13 @@ func (spq StringHeap) Less(i, j int) bool {
 // Swap swaps the two elements indicated via the given indices.
 func (spq StringHeap) Swap(i, j int) { spq[i], spq[j] = spq[j], spq[i] }
 
-// Push pushes the given interface{} to the heap.
+// Push pushes the given any to the heap.
 //
-// Will panic if given interface{} is not a string.
-func (spq *StringHeap) Push(x interface{}) { *spq = append(*spq, x.(string)) }
+// Will panic if given any is not a string.
+func (spq *StringHeap) Push(x any) { *spq = append(*spq, x.(string)) }
 
 // Pop pops the tail of the queue.
-func (spq *StringHeap) Pop() interface{} {
+func (spq *StringHeap) Pop() any {
 	old := *spq
 	n := len(old)
 	str := old[n-1]
@@ -154,10 +154,10 @@ func ReplaceCharIndexRange(old string, indices [][]int, new ...string) string {
 	return old
 }
 
-// The TypeName of the given interface{}.
+// The TypeName of the given any.
 //
 // If i is nil, "<nil>" will be returned.
-func TypeName(i interface{}) string {
+func TypeName(i any) string {
 	if i == nil {
 		return "<nil>"
 	}

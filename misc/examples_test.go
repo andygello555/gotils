@@ -3,7 +3,9 @@ package misc
 import "fmt"
 
 // Check if the email:
-//  test@example.com
+//
+//	test@example.com
+//
 // Is valid and then check whether some normal text is valid.
 func ExampleIsEmailValid() {
 	// Valid example

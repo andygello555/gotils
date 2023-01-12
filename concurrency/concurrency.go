@@ -4,16 +4,16 @@ package concurrency
 // InOut creates infinite channels that don't block when written to.
 //
 // This is from https://medium.com/capital-one-tech/building-an-unbounded-channel-in-go-789e175cd2cd.
-func InOut() (chan<- interface{}, <-chan interface{}) {
-	in := make(chan interface{})
-	out := make(chan interface{})
+func InOut() (chan<- any, <-chan any) {
+	in := make(chan any)
+	out := make(chan any)
 
 	go func() {
-		var inQueue []interface{}
+		var inQueue []any
 
 		// Temp function which returns the out channel to write to
 		// This is done to avoid writing nils to the out channel
-		outCh := func() chan interface{} {
+		outCh := func() chan any {
 			if len(inQueue) == 0 {
 				return nil
 			}
@@ -21,7 +21,7 @@ func InOut() (chan<- interface{}, <-chan interface{}) {
 		}
 
 		// Returns the head of the input queue if the queue is not empty otherwise it returns nil
-		curVal := func() interface{} {
+		curVal := func() any {
 			if len(inQueue) == 0 {
 				return nil
 			}

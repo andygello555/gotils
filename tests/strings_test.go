@@ -91,7 +91,7 @@ func TestReplaceCharIndexRange(t *testing.T) {
 
 func TestTypeName(t *testing.T) {
 	for _, test := range []struct {
-		i              interface{}
+		i              any
 		expectedOutput string
 	}{
 		{
@@ -99,7 +99,7 @@ func TestTypeName(t *testing.T) {
 			"string",
 		},
 		{
-			map[string]interface{}{
+			map[string]any{
 				"hello": "world",
 			},
 			"map[string]interface {}",
