@@ -37,7 +37,7 @@ func ExampleAddElems() {
 
 // Remove the given indices from an array.
 func ExampleRemoveElems() {
-	arr := []any{1, 2, 3, 4, 5}
+	arr := []int{1, 2, 3, 4, 5}
 	fmt.Println("Before:", arr)
 
 	// All duplicate indices will be removed.

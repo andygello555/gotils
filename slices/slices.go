@@ -93,13 +93,13 @@ func AddElems(slice []any, value any, indices ...int) []any {
 	return newArr
 }
 
-// RemoveElems removes the elements at the given indices in the given interface slice and returns a new slice.
+// RemoveElems removes the elements at the given indices in the given slice and returns a new slice of that type.
 //
-// The new array will have a length which is the difference between the length of the given slice and the length of the
-// given indices as a unique set.
-func RemoveElems(slice []any, indices ...int) []any {
+// The new array will have a length which is the difference between the length of the given slice and the cardinality of
+// the given indices as a unique set.
+func RemoveElems[E any](slice []E, indices ...int) []E {
 	RemoveDuplicatesAndSort(&indices)
-	out := make([]any, 0)
+	out := make([]E, 0)
 	// Simple priority queue structure
 	var currIdx int
 	currIdx, indices = indices[0], indices[1:]
