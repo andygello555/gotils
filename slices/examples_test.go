@@ -28,11 +28,14 @@ func ExampleAddElems() {
 
 	// All duplicate indices will be removed.
 	// Here the new length of the array will be 7 as it is greater than len(arr) + len(unique indices).
-	arr = AddElems(arr, 4, 0, 0, 3, 7, 1)
+	arr = AddElems(arr, []int{4}, 0, 0, 3, 7, 1)
 	fmt.Println("After:", arr)
+
+	fmt.Println(AddElems([]string{"Hello", "Gertrude"}, []string{"my", "name", "is"}, 1, 2, 3))
 	// Output:
 	// Before: [1 2 3]
 	// After: [4 4 1 4 2 3 0 4]
+	// [Hello my name is Gertrude]
 }
 
 // Remove the given indices from an array.

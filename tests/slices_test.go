@@ -38,19 +38,19 @@ func TestRemoveDuplicatesAndSort(t *testing.T) {
 func TestAddElems(t *testing.T) {
 	for _, test := range []struct {
 		slice          []any
-		value          any
+		value          []any
 		indices        []int
 		expectedOutput []any
 	}{
 		{
 			[]any{"hello", "world", "insert", "here", "->", "<-", "nice"},
-			": )",
+			[]any{": )"},
 			[]int{5},
 			[]any{"hello", "world", "insert", "here", "->", ": )", "<-", "nice"},
 		},
 		{
 			[]any{1, 2, 3},
-			0,
+			[]any{0},
 			[]int{0, 0, 3, 7, 1},
 			[]any{0, 0, 1, 0, 2, 3, nil, 0},
 		},
@@ -69,9 +69,9 @@ func TestAddElems(t *testing.T) {
 				"Sarah",
 				"John",
 			},
-			map[string]string{
+			[]any{map[string]string{
 				"hello": "world",
-			},
+			}},
 			[]int{0, 1, 3, 9, 3, 1},
 			[]any{
 				map[string]string{
@@ -104,9 +104,21 @@ func TestAddElems(t *testing.T) {
 		},
 		{
 			[]any{1, 2, 3},
-			4,
+			[]any{4},
 			[]int{3},
 			[]any{1, 2, 3, 4},
+		},
+		{
+			[]any{1, 2, 3},
+			[]any{},
+			[]int{1},
+			[]any{1, 0, 3, 4},
+		},
+		{
+			[]any{1, 2, 3},
+			[]any{4, 5, 6, 7},
+			[]int{3, 4, 5},
+			[]any{1, 2, 3, 4, 5, 6},
 		},
 	} {
 		newSlice := slices.AddElems(test.slice, test.value, test.indices...)

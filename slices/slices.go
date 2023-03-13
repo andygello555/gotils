@@ -53,12 +53,18 @@ func RemoveDuplicatesAndSort(indices *[]int) {
 	*indices = actualIndices
 }
 
-// AddElems adds the given value at the given indices.
+// AddElems adds the given values at the given indices.
 //
 // If there is an index which exceeds the length of the given slice plus the number of unique indices given then this
 // will result in a new array that's the length of the maximum index in indices. If this happens then each "empty"
 // space will be filled by E's zero-value.
-func AddElems[E any](slice []E, value E, indices ...int) []E {
+//
+// Each given value will be inserted in their given order. If the number of given values aren't the same length as the
+// number of (unique) indices, then the last given value will be inserted as many times as there are indices left. If
+// the number of given values is greater than the number of given indices, all values that reside at an index that is
+// greater than or equal to the number of given indices will be ignored. I.e. not inserted into the output slice. If
+// there are no values given, then the zero-value will be inserted at all given indices.
+func AddElems[E any](slice []E, values []E, indices ...int) []E {
 	RemoveDuplicatesAndSort(&indices)
 	// Find the bounds of the new array which will contain the appended value. This is either:
 	// 1. The maximum index: when it exceeds the limits of the new array which will be the length of the slice plus the number of indices
@@ -76,13 +82,22 @@ func AddElems[E any](slice []E, value E, indices ...int) []E {
 	var currIdx int
 	currIdx, indices = indices[0], indices[1:]
 
+	valuePtr := 0
+	if len(values) == 0 {
+		var x E
+		values = append(values, x)
+	}
+
 	// Iterate from 0 to high inserting a value at each index to insert into
 	for i := 0; i < high; i++ {
 		if currIdx == i {
 			if len(indices) > 0 {
 				currIdx, indices = indices[0], indices[1:]
 			}
-			newArr[i] = value
+			newArr[i] = values[valuePtr]
+			if valuePtr < len(values)-1 {
+				valuePtr++
+			}
 			offset += 1
 			continue
 		}
