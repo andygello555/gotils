@@ -23,16 +23,16 @@ func ExampleSameElements() {
 
 // Add the given element at the given indices.
 func ExampleAddElems() {
-	arr := []any{1, 2, 3}
+	arr := []int{1, 2, 3}
 	fmt.Println("Before:", arr)
 
 	// All duplicate indices will be removed.
 	// Here the new length of the array will be 7 as it is greater than len(arr) + len(unique indices).
-	arr = AddElems(arr, 0, 0, 0, 3, 7, 1)
+	arr = AddElems(arr, 4, 0, 0, 3, 7, 1)
 	fmt.Println("After:", arr)
 	// Output:
 	// Before: [1 2 3]
-	// After: [0 0 1 0 2 3 <nil> 0]
+	// After: [4 4 1 4 2 3 0 4]
 }
 
 // Remove the given indices from an array.

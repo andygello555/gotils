@@ -56,9 +56,9 @@ func RemoveDuplicatesAndSort(indices *[]int) {
 // AddElems adds the given value at the given indices.
 //
 // If there is an index which exceeds the length of the given slice plus the number of unique indices given then this
-// will result in a new array that's the length of the maximum index in indices. If this happens then any "empty"
-// space will be filled by default by "nil".
-func AddElems(slice []any, value any, indices ...int) []any {
+// will result in a new array that's the length of the maximum index in indices. If this happens then each "empty"
+// space will be filled by E's zero-value.
+func AddElems[E any](slice []E, value E, indices ...int) []E {
 	RemoveDuplicatesAndSort(&indices)
 	// Find the bounds of the new array which will contain the appended value. This is either:
 	// 1. The maximum index: when it exceeds the limits of the new array which will be the length of the slice plus the number of indices
@@ -70,7 +70,7 @@ func AddElems(slice []any, value any, indices ...int) []any {
 		high = len(slice) + len(indices)
 	}
 	// Construct a new array from the specifications above
-	newArr := make([]any, high)
+	newArr := make([]E, high)
 	offset := 0
 
 	var currIdx int
