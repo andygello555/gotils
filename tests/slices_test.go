@@ -112,13 +112,37 @@ func TestAddElems(t *testing.T) {
 			[]any{1, 2, 3},
 			[]any{},
 			[]int{1},
-			[]any{1, 0, 3, 4},
+			[]any{1, nil, 2, 3},
 		},
 		{
 			[]any{1, 2, 3},
 			[]any{4, 5, 6, 7},
 			[]int{3, 4, 5},
 			[]any{1, 2, 3, 4, 5, 6},
+		},
+		{
+			[]any{1, 2, 3},
+			[]any{4, 5, 6},
+			[]int{},
+			[]any{1, 2, 3},
+		},
+		{
+			[]any{},
+			[]any{1, 2, 3},
+			[]int{0, 1, 2},
+			[]any{1, 2, 3},
+		},
+		{
+			[]any{},
+			[]any{},
+			[]int{},
+			[]any{},
+		},
+		{
+			[]any{},
+			[]any{},
+			[]int{0, 1, 2},
+			[]any{nil, nil, nil},
 		},
 	} {
 		newSlice := slices.AddElems(test.slice, test.value, test.indices...)
@@ -173,6 +197,16 @@ func TestRemoveElems(t *testing.T) {
 			[]any{1, 2, 3},
 			[]int{2},
 			[]any{1, 2},
+		},
+		{
+			[]any{1, 2, 3},
+			[]int{},
+			[]any{1, 2, 3},
+		},
+		{
+			[]any{},
+			[]int{1, 2, 3},
+			[]any{},
 		},
 	} {
 		newSlice := slices.RemoveElems(test.slice, test.indices...)

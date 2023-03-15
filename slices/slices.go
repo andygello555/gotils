@@ -59,18 +59,25 @@ func RemoveDuplicatesAndSort(indices *[]int) {
 // will result in a new array that's the length of the maximum index in indices. If this happens then each "empty"
 // space will be filled by E's zero-value.
 //
-// Each given value will be inserted in their given order. If the number of given values aren't the same length as the
-// number of (unique) indices, then the last given value will be inserted as many times as there are indices left. If
-// the number of given values is greater than the number of given indices, all values that reside at an index that is
-// greater than or equal to the number of given indices will be ignored. I.e. not inserted into the output slice. If
-// there are no values given, then the zero-value will be inserted at all given indices.
+// Each given value will be inserted in their given order. If the number of given values is less than the length of the
+// number of (unique) indices, then the last given value will be inserted as many times as there are indices left.
+//
+// If the number of given values is greater than the number of given indices, all values that reside at an index that
+// are greater than or equal to the number of given indices will be ignored. I.e. not inserted into the output slice.
+//
+// If there are no values given, then the zero-value will be inserted at all given indices.
+//
+// If there are no indices given, then a copy of slice will be returned.
 func AddElems[E any](slice []E, values []E, indices ...int) []E {
 	RemoveDuplicatesAndSort(&indices)
 	// Find the bounds of the new array which will contain the appended value. This is either:
-	// 1. The maximum index: when it exceeds the limits of the new array which will be the length of the slice plus the number of indices
-	// 2. The length of the slice plus the number of indices: otherwise
+	// 1. The length of the slice: if there are no indices
+	// 2. The maximum index: when it exceeds the limits of the new array which will be the length of the slice plus the number of indices
+	// 3. The length of the slice plus the number of indices: otherwise
 	var high int
-	if indices[len(indices)-1]+1 > len(slice)+len(indices) {
+	if len(indices) == 0 {
+		high = len(slice)
+	} else if indices[len(indices)-1]+1 > len(slice)+len(indices) {
 		high = indices[len(indices)-1] + 1
 	} else {
 		high = len(slice) + len(indices)
@@ -79,8 +86,10 @@ func AddElems[E any](slice []E, values []E, indices ...int) []E {
 	newArr := make([]E, high)
 	offset := 0
 
-	var currIdx int
-	currIdx, indices = indices[0], indices[1:]
+	currIdx := len(newArr)
+	if len(indices) > 0 {
+		currIdx, indices = indices[0], indices[1:]
+	}
 
 	valuePtr := 0
 	if len(values) == 0 {
@@ -112,12 +121,17 @@ func AddElems[E any](slice []E, values []E, indices ...int) []E {
 //
 // The new array will have a length which is the difference between the length of the given slice and the cardinality of
 // the given indices as a unique set.
+//
+// If no indices are given, then a copy of the slice will be returned.
 func RemoveElems[E any](slice []E, indices ...int) []E {
 	RemoveDuplicatesAndSort(&indices)
 	out := make([]E, 0)
+
 	// Simple priority queue structure
-	var currIdx int
-	currIdx, indices = indices[0], indices[1:]
+	currIdx := len(slice)
+	if len(indices) > 0 {
+		currIdx, indices = indices[0], indices[1:]
+	}
 
 	for i, elem := range slice {
 		if i == currIdx {
