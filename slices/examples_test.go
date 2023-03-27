@@ -2,6 +2,7 @@ package slices
 
 import (
 	"fmt"
+	"math"
 	"reflect"
 )
 
@@ -91,4 +92,20 @@ func ExampleReverseOut() {
 	// Before (intArr): [1 2 3 4 5], type = []int
 	// After (intArr): [5 4 3 2 1], type = []int
 	// After (floatArr): [5 4 3 2 1], type = []float64
+}
+
+// Filters a list of integers.
+func ExampleFilter() {
+	fmt.Println(
+		"square numbers (0-9):",
+		Filter([]int{1, 2, 3, 4, 5, 6, 7, 8, 9}, func(idx int, value int, arr []int) bool {
+			if value >= 0 {
+				sr := int(math.Sqrt(float64(value)))
+				return sr*sr == value
+			}
+			return false
+		},
+		))
+	// Output:
+	// square numbers (0-9): [1 4 9]
 }

@@ -158,6 +158,21 @@ func Comprehension[IE any, OE any](s []IE, fun func(idx int, value IE, arr []IE)
 	return out
 }
 
+// Filter takes a list of elements of any type and runs the given predicate function on each element. If the predicate
+// returns true for an element, then that element will be added to a new list of the same type as the one provided.
+//
+// The first parameter of the predicate is the index of the currently iterated element within the given slice. The second
+// is the currently iterated element's values, and the last is the input array in full.
+func Filter[E any](s []E, fun func(idx int, value E, arr []E) bool) []E {
+	out := make([]E, 0, len(s))
+	for i, ie := range s {
+		if fun(i, ie, s) {
+			out = append(out, ie)
+		}
+	}
+	return out
+}
+
 // Reverse reverses a slice in-place.
 func Reverse[IE any](s []IE) {
 	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
