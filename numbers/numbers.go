@@ -122,6 +122,16 @@ func Min[N Number](numbers ...N) (min N) {
 	return min
 }
 
+// Sum returns the sum of all the given Number(s).
+//
+// If no Number(s) are given, 0 is returned.
+func Sum[N Number](numbers ...N) (sum N) {
+	for _, number := range numbers {
+		sum += number
+	}
+	return
+}
+
 // Ordinal gives you the input integer with a rank/ordinal format.
 //
 // Ordinal(3) -> "3rd". Straight from the "go-humanize" library: https://github.com/dustin/go-humanize.

@@ -3,6 +3,8 @@ package slices
 
 import (
 	"fmt"
+	"github.com/andygello555/gotils/v2/numbers"
+	"reflect"
 	"sort"
 )
 
@@ -145,6 +147,27 @@ func RemoveElems[E any](slice []E, indices ...int) []E {
 	return out
 }
 
+// Join returns a new array of the given type that is created by joining/concatenating the elements of each given slice
+// in their given order.
+//
+// If no arrays are given, then an empty slice is returned.
+func Join[E any](ss ...[]E) []E {
+	outLen := numbers.Sum(Comprehension(ss, func(idx int, value []E, arr [][]E) int {
+		return len(value)
+	})...)
+	out := make([]E, outLen, outLen)
+
+	if outLen > 0 {
+		start := 0
+		for _, s := range ss {
+			end := start + len(s)
+			copy(out[start:end], s)
+			start = end
+		}
+	}
+	return out
+}
+
 // Comprehension takes a list of elements of any type and runs the given function on each element to construct a new
 // list with elements of the given type.
 //
@@ -156,6 +179,11 @@ func Comprehension[IE any, OE any](s []IE, fun func(idx int, value IE, arr []IE)
 		out[i] = fun(i, ie, s)
 	}
 	return out
+}
+
+// JoinedComprehension performs Comprehension on an array created from the Join of the given arrays.
+func JoinedComprehension[IE any, OE any](fun func(idx int, value IE, arr []IE) OE, ss ...[]IE) []OE {
+	return Comprehension(Join(ss...), fun)
 }
 
 // Filter takes a list of elements of any type and runs the given predicate function on each element. If the predicate
@@ -185,4 +213,119 @@ func Reverse[IE any](s []IE) {
 func ReverseOut[IE any](s []IE) []IE {
 	Reverse(s)
 	return s
+}
+
+func emptyFuncsResolve[E any]() (funcs []func(idx int, value E, arr []E) bool) {
+	funcs = make([]func(idx int, value E, arr []E) bool, 1, 1)
+	e := any(new(E))
+	switch e.(type) {
+	case *bool:
+		funcs[0] = func(idx int, value E, arr []E) bool {
+			return any(value).(bool)
+		}
+	case *string:
+		funcs[0] = func(idx int, value E, arr []E) bool {
+			return any(value).(string) != ""
+		}
+	default:
+		eVal := reflect.ValueOf(e).Elem()
+		eType := eVal.Type()
+		switch {
+		case eVal.CanInt(), eVal.CanUint(), eVal.CanFloat():
+			funcs[0] = func(idx int, value E, arr []E) bool {
+				val := reflect.ValueOf(value)
+				return val.Convert(reflect.TypeOf(0.0)).Float() > 0
+			}
+		case eType.Kind() == reflect.Array, eType.Kind() == reflect.Slice,
+			eType.Kind() == reflect.Ptr && eType.Elem().Kind() == reflect.Array:
+			funcs[0] = func(idx int, value E, arr []E) bool {
+				return reflect.ValueOf(value).Len() > 0
+			}
+		default:
+			funcs[0] = func(idx int, value E, arr []E) bool {
+				return true
+			}
+		}
+	}
+	return
+}
+
+// Any returns true if any of the elements in the given array are proved to be truthy according to the given functions.
+//
+// If "i" is the index of the currently iterated element then we will use the function located at index:
+//
+//	i % len(funcs)
+//
+// If true is returned by the function at this index before the last element has been evaluated, then All will return
+// true early.
+//
+// If the given array is empty, then false is returned.
+//
+// If no functions are provided to Any, then depending on the type of the array, the following will occur, in order of
+// priority (type signatures are given as regex to avoid verbosity):
+//   - r"\[\]bool" (array of booleans): returns the value of the current boolean element.
+//   - r"\[\]string" (array of strings): returns whether the value of the current string element != "".
+//   - r"\[\]*?\[\].+" (array of arrays/pointers to arrays): returns whether the current nested array's length is > 0.
+//   - r"\[\](u?int(8|16|32|64)?|float(32|64))" (array of numbers): returns true when the element is > 0.
+//   - Otherwise, the only function will be one that always returns true.
+func Any[E any](s []E, funcs ...func(idx int, value E, arr []E) bool) bool {
+	if len(s) == 0 {
+		return false
+	}
+
+	if len(funcs) == 0 {
+		funcs = emptyFuncsResolve[E]()
+	}
+
+	for i, e := range s {
+		if funcs[i%len(funcs)](i, e, s) {
+			return true
+		}
+	}
+	return false
+}
+
+// JoinedAny performs Any on an array created from the Join of the given arrays.
+func JoinedAny[E any](funcs []func(idx int, value E, arr []E) bool, ss ...[]E) bool {
+	return Any(Join(ss...), funcs...)
+}
+
+// All returns true if all the elements in the given array are proved to be truthy according to the given functions.
+//
+// If "i" is the index of the currently iterated element then we will use the function located at index:
+//
+//	i % len(funcs)
+//
+// If false is returned by the function at this index before the last element has been evaluated, then All will return
+// false early.
+//
+// If the given array is empty, then false is returned.
+//
+// If no functions are provided to All, then depending on the type of the array, the following will occur, in order of
+// priority (type signatures are given as regex to avoid verbosity):
+//   - r"\[\]bool" (array of booleans): returns the value of the current boolean element.
+//   - r"\[\]string" (array of strings): returns whether the value of the current string element != "".
+//   - r"\[\]*?\[\].+" (array of arrays/pointers to arrays): returns whether the current nested array's length is > 0.
+//   - r"\[\](u?int(8|16|32|64)?|float(32|64))" (array of numbers): returns true when the element is > 0.
+//   - Otherwise, the only function will be one that always returns true.
+func All[E any](s []E, funcs ...func(idx int, value E, arr []E) bool) bool {
+	if len(s) == 0 {
+		return false
+	}
+
+	if len(funcs) == 0 {
+		funcs = emptyFuncsResolve[E]()
+	}
+
+	for i, e := range s {
+		if !funcs[i%len(funcs)](i, e, s) {
+			return false
+		}
+	}
+	return true
+}
+
+// JoinedAll performs All on an array created from the Join of the given arrays.
+func JoinedAll[E any](funcs []func(idx int, value E, arr []E) bool, ss ...[]E) bool {
+	return All(Join(ss...), funcs...)
 }

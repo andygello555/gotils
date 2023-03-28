@@ -46,6 +46,16 @@ func ExampleClampMinMax() {
 	// [2 2 3 3]
 }
 
+// Counting down from 10 in intervals of 2.
+//
+// The Range function is similar to the range function in Python.
+func ExampleRange() {
+	r := Range(10, 0, -2)
+	fmt.Println(r)
+	// Output:
+	// [10 8 6 4 2 0]
+}
+
 // Prints out an array of positive numbers from an array of positive and negative numbers.
 func ExampleAbs() {
 	x := []float32{-1.0, 1.0, -0.001, 0.001}
@@ -57,14 +67,25 @@ func ExampleAbs() {
 	// [1 1 0.001 0.001]
 }
 
-// Counting down from 10 in intervals of 2.
-//
-// The Range function is similar to the range function in Python.
-func ExampleRange() {
-	r := Range(10, 0, -2)
-	fmt.Println(r)
+// Finds the maximum floating point number.
+func ExampleMax() {
+	fmt.Println(Max(-0.0023, 0.0023, 0.1, 200.0, -0.0032))
 	// Output:
-	// [10 8 6 4 2 0]
+	// 200
+}
+
+// Finds the minimum floating point number.
+func ExampleMin() {
+	fmt.Println(Min(-0.0023, 0.0023, 0.1, 200.0, -0.0032))
+	// Output:
+	// -0.0032
+}
+
+// Finds the sum of the given floating point numbers.
+func ExampleSum() {
+	fmt.Println(Sum(-0.0023, 0.0023, 0.1, 200.0, -0.0032))
+	// Output:
+	// 200.0968
 }
 
 // Generates the ordinals for 1, 2 and 3.

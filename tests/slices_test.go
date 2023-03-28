@@ -286,3 +286,514 @@ func TestSameElements(t *testing.T) {
 		}
 	}
 }
+
+func TestJoin(t *testing.T) {
+	for testNo, test := range []struct {
+		arrays   [][]any
+		expected []any
+	}{
+		{
+			arrays:   [][]any{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}},
+			expected: []any{1, 2, 3, 4, 5, 6, 7, 8, 9},
+		},
+		{
+			arrays:   [][]any{},
+			expected: []any{},
+		},
+		{
+			arrays:   [][]any{{1, 2, 3}},
+			expected: []any{1, 2, 3},
+		},
+	} {
+		actual := slices.Join(test.arrays...)
+		if !reflect.DeepEqual(actual, test.expected) {
+			t.Errorf("%d: Got %v, expected %v", testNo+1, actual, test.expected)
+		}
+	}
+}
+
+func TestAny(t *testing.T) {
+	for testNo, test := range []struct {
+		array    []bool
+		funcs    []func(idx int, value bool, arr []bool) bool
+		expected bool
+	}{
+		{
+			array:    []bool{false, true, false},
+			funcs:    []func(idx int, value bool, arr []bool) bool{},
+			expected: true,
+		},
+		{
+			array:    []bool{false, false, false},
+			funcs:    []func(idx int, value bool, arr []bool) bool{},
+			expected: false,
+		},
+		{
+			array:    []bool{},
+			funcs:    []func(idx int, value bool, arr []bool) bool{},
+			expected: false,
+		},
+		{
+			array: []bool{true, true, true},
+			funcs: []func(idx int, value bool, arr []bool) bool{
+				func(idx int, value bool, arr []bool) bool {
+					return !value
+				},
+			},
+			expected: false,
+		},
+		{
+			array: []bool{true, false, true, false},
+			funcs: []func(idx int, value bool, arr []bool) bool{
+				func(idx int, value bool, arr []bool) bool {
+					return !value
+				},
+				func(idx int, value bool, arr []bool) bool {
+					return value
+				},
+			},
+			expected: false,
+		},
+	} {
+		actual := slices.Any(test.array, test.funcs...)
+		if actual != test.expected {
+			t.Errorf("[]bool no. %d (%v): Got %t, expected %t", testNo+1, test, actual, test.expected)
+		}
+	}
+
+	for testNo, test := range []struct {
+		array    []float64
+		funcs    []func(idx int, value float64, arr []float64) bool
+		expected bool
+	}{
+		{
+			array:    []float64{0.0, 1.0, 0.0},
+			funcs:    []func(idx int, value float64, arr []float64) bool{},
+			expected: true,
+		},
+		{
+			array:    []float64{0.0, 0.0, 0.0},
+			funcs:    []func(idx int, value float64, arr []float64) bool{},
+			expected: false,
+		},
+		{
+			array:    []float64{},
+			funcs:    []func(idx int, value float64, arr []float64) bool{},
+			expected: false,
+		},
+		{
+			array: []float64{1.0, 2.0, 3.0},
+			funcs: []func(idx int, value float64, arr []float64) bool{
+				func(idx int, value float64, arr []float64) bool {
+					return value == 0
+				},
+			},
+			expected: false,
+		},
+		{
+			array: []float64{1.0, 0.0, 2.0, 0.0},
+			funcs: []func(idx int, value float64, arr []float64) bool{
+				func(idx int, value float64, arr []float64) bool {
+					return value == 0
+				},
+				func(idx int, value float64, arr []float64) bool {
+					return value > 0
+				},
+			},
+			expected: false,
+		},
+	} {
+		actual := slices.Any(test.array, test.funcs...)
+		if actual != test.expected {
+			t.Errorf("[]float64 no. %d (%v): Got %t, expected %t", testNo+1, test, actual, test.expected)
+		}
+	}
+
+	for testNo, test := range []struct {
+		array    []string
+		funcs    []func(idx int, value string, arr []string) bool
+		expected bool
+	}{
+		{
+			array:    []string{"", "+", ""},
+			funcs:    []func(idx int, value string, arr []string) bool{},
+			expected: true,
+		},
+		{
+			array:    []string{"", "", ""},
+			funcs:    []func(idx int, value string, arr []string) bool{},
+			expected: false,
+		},
+		{
+			array:    []string{},
+			funcs:    []func(idx int, value string, arr []string) bool{},
+			expected: false,
+		},
+		{
+			array: []string{"1", "2", "3"},
+			funcs: []func(idx int, value string, arr []string) bool{
+				func(idx int, value string, arr []string) bool {
+					return value == ""
+				},
+			},
+			expected: false,
+		},
+		{
+			array: []string{"1", "", "2", ""},
+			funcs: []func(idx int, value string, arr []string) bool{
+				func(idx int, value string, arr []string) bool {
+					return value == ""
+				},
+				func(idx int, value string, arr []string) bool {
+					return value != ""
+				},
+			},
+			expected: false,
+		},
+	} {
+		actual := slices.Any(test.array, test.funcs...)
+		if actual != test.expected {
+			t.Errorf("[]string no. %d (%v): Got %t, expected %t", testNo+1, test, actual, test.expected)
+		}
+	}
+
+	for testNo, test := range []struct {
+		array    []*[]any
+		funcs    []func(idx int, value *[]any, arr []*[]any) bool
+		expected bool
+	}{
+		{
+			array:    []*[]any{{}, {1}, {}},
+			funcs:    []func(idx int, value *[]any, arr []*[]any) bool{},
+			expected: true,
+		},
+		{
+			array: []*[]any{{}, {}, {}},
+			funcs: []func(idx int, value *[]any, arr []*[]any) bool{},
+			// This returns true because the empty arrays above are actually slices
+			expected: true,
+		},
+		{
+			array:    []*[]any{},
+			funcs:    []func(idx int, value *[]any, arr []*[]any) bool{},
+			expected: false,
+		},
+		{
+			array: []*[]any{{1}, {2}, {3}},
+			funcs: []func(idx int, value *[]any, arr []*[]any) bool{
+				func(idx int, value *[]any, arr []*[]any) bool {
+					return len(*value) == 0
+				},
+			},
+			expected: false,
+		},
+		{
+			array: []*[]any{{1}, {}, {2}, {}},
+			funcs: []func(idx int, value *[]any, arr []*[]any) bool{
+				func(idx int, value *[]any, arr []*[]any) bool {
+					return len(*value) == 0
+				},
+				func(idx int, value *[]any, arr []*[]any) bool {
+					return len(*value) > 0
+				},
+			},
+			expected: false,
+		},
+	} {
+		actual := slices.Any(test.array, test.funcs...)
+		if actual != test.expected {
+			t.Errorf("[]*[]any no. %d (%v): Got %t, expected %t", testNo+1, test, actual, test.expected)
+		}
+	}
+
+	for testNo, test := range []struct {
+		array    []float64
+		funcs    []func(idx int, value float64, arr []float64) bool
+		expected bool
+	}{
+		{
+			array:    []float64{0.0, 1.0, 0.0},
+			funcs:    []func(idx int, value float64, arr []float64) bool{},
+			expected: true,
+		},
+		{
+			array:    []float64{0.0, 0.0, 0.0},
+			funcs:    []func(idx int, value float64, arr []float64) bool{},
+			expected: false,
+		},
+		{
+			array:    []float64{},
+			funcs:    []func(idx int, value float64, arr []float64) bool{},
+			expected: false,
+		},
+		{
+			array: []float64{1.0, 2.0, 3.0},
+			funcs: []func(idx int, value float64, arr []float64) bool{
+				func(idx int, value float64, arr []float64) bool {
+					return value == 0
+				},
+			},
+			expected: false,
+		},
+		{
+			array: []float64{1.0, 0.0, 2.0, 0.0},
+			funcs: []func(idx int, value float64, arr []float64) bool{
+				func(idx int, value float64, arr []float64) bool {
+					return value == 0
+				},
+				func(idx int, value float64, arr []float64) bool {
+					return value > 0
+				},
+			},
+			expected: false,
+		},
+	} {
+		actual := slices.Any(test.array, test.funcs...)
+		if actual != test.expected {
+			t.Errorf("[]float64 no. %d (%v): Got %t, expected %t", testNo+1, test, actual, test.expected)
+		}
+	}
+}
+
+func TestAll(t *testing.T) {
+	for testNo, test := range []struct {
+		array    []bool
+		funcs    []func(idx int, value bool, arr []bool) bool
+		expected bool
+	}{
+		{
+			array:    []bool{true, true, true},
+			funcs:    []func(idx int, value bool, arr []bool) bool{},
+			expected: true,
+		},
+		{
+			array:    []bool{false, false, false},
+			funcs:    []func(idx int, value bool, arr []bool) bool{},
+			expected: false,
+		},
+		{
+			array:    []bool{},
+			funcs:    []func(idx int, value bool, arr []bool) bool{},
+			expected: false,
+		},
+		{
+			array: []bool{true, true, true},
+			funcs: []func(idx int, value bool, arr []bool) bool{
+				func(idx int, value bool, arr []bool) bool {
+					return !value
+				},
+			},
+			expected: false,
+		},
+		{
+			array: []bool{true, false, true, false},
+			funcs: []func(idx int, value bool, arr []bool) bool{
+				func(idx int, value bool, arr []bool) bool {
+					return !value
+				},
+				func(idx int, value bool, arr []bool) bool {
+					return value
+				},
+			},
+			expected: false,
+		},
+	} {
+		actual := slices.All(test.array, test.funcs...)
+		if actual != test.expected {
+			t.Errorf("[]bool no. %d (%v): Got %t, expected %t", testNo+1, test, actual, test.expected)
+		}
+	}
+
+	for testNo, test := range []struct {
+		array    []float64
+		funcs    []func(idx int, value float64, arr []float64) bool
+		expected bool
+	}{
+		{
+			array:    []float64{1.0, 1.0, 1.0},
+			funcs:    []func(idx int, value float64, arr []float64) bool{},
+			expected: true,
+		},
+		{
+			array:    []float64{0.0, 0.0, 0.0},
+			funcs:    []func(idx int, value float64, arr []float64) bool{},
+			expected: false,
+		},
+		{
+			array:    []float64{},
+			funcs:    []func(idx int, value float64, arr []float64) bool{},
+			expected: false,
+		},
+		{
+			array: []float64{1.0, 2.0, 3.0},
+			funcs: []func(idx int, value float64, arr []float64) bool{
+				func(idx int, value float64, arr []float64) bool {
+					return value == 0
+				},
+			},
+			expected: false,
+		},
+		{
+			array: []float64{1.0, 0.0, 2.0, 0.0},
+			funcs: []func(idx int, value float64, arr []float64) bool{
+				func(idx int, value float64, arr []float64) bool {
+					return value == 0
+				},
+				func(idx int, value float64, arr []float64) bool {
+					return value > 0
+				},
+			},
+			expected: false,
+		},
+	} {
+		actual := slices.All(test.array, test.funcs...)
+		if actual != test.expected {
+			t.Errorf("[]float64 no. %d (%v): Got %t, expected %t", testNo+1, test, actual, test.expected)
+		}
+	}
+
+	for testNo, test := range []struct {
+		array    []string
+		funcs    []func(idx int, value string, arr []string) bool
+		expected bool
+	}{
+		{
+			array:    []string{"1", "2", "3"},
+			funcs:    []func(idx int, value string, arr []string) bool{},
+			expected: true,
+		},
+		{
+			array:    []string{"", "", ""},
+			funcs:    []func(idx int, value string, arr []string) bool{},
+			expected: false,
+		},
+		{
+			array:    []string{},
+			funcs:    []func(idx int, value string, arr []string) bool{},
+			expected: false,
+		},
+		{
+			array: []string{"1", "2", "3"},
+			funcs: []func(idx int, value string, arr []string) bool{
+				func(idx int, value string, arr []string) bool {
+					return value == ""
+				},
+			},
+			expected: false,
+		},
+		{
+			array: []string{"1", "", "2", ""},
+			funcs: []func(idx int, value string, arr []string) bool{
+				func(idx int, value string, arr []string) bool {
+					return value == ""
+				},
+				func(idx int, value string, arr []string) bool {
+					return value != ""
+				},
+			},
+			expected: false,
+		},
+	} {
+		actual := slices.All(test.array, test.funcs...)
+		if actual != test.expected {
+			t.Errorf("[]string no. %d (%v): Got %t, expected %t", testNo+1, test, actual, test.expected)
+		}
+	}
+
+	for testNo, test := range []struct {
+		array    []*[]any
+		funcs    []func(idx int, value *[]any, arr []*[]any) bool
+		expected bool
+	}{
+		{
+			array:    []*[]any{{1}, {2}, {3}},
+			funcs:    []func(idx int, value *[]any, arr []*[]any) bool{},
+			expected: true,
+		},
+		{
+			array: []*[]any{{}, {}, {}},
+			funcs: []func(idx int, value *[]any, arr []*[]any) bool{},
+			// This returns true because the empty arrays above are actually slices
+			expected: true,
+		},
+		{
+			array:    []*[]any{},
+			funcs:    []func(idx int, value *[]any, arr []*[]any) bool{},
+			expected: false,
+		},
+		{
+			array: []*[]any{{1}, {2}, {3}},
+			funcs: []func(idx int, value *[]any, arr []*[]any) bool{
+				func(idx int, value *[]any, arr []*[]any) bool {
+					return len(*value) == 0
+				},
+			},
+			expected: false,
+		},
+		{
+			array: []*[]any{{1}, {}, {2}, {}},
+			funcs: []func(idx int, value *[]any, arr []*[]any) bool{
+				func(idx int, value *[]any, arr []*[]any) bool {
+					return len(*value) == 0
+				},
+				func(idx int, value *[]any, arr []*[]any) bool {
+					return len(*value) > 0
+				},
+			},
+			expected: false,
+		},
+	} {
+		actual := slices.All(test.array, test.funcs...)
+		if actual != test.expected {
+			t.Errorf("[]*[]any no. %d (%v): Got %t, expected %t", testNo+1, test, actual, test.expected)
+		}
+	}
+
+	for testNo, test := range []struct {
+		array    []float64
+		funcs    []func(idx int, value float64, arr []float64) bool
+		expected bool
+	}{
+		{
+			array:    []float64{1.0, 2.0, 3.0},
+			funcs:    []func(idx int, value float64, arr []float64) bool{},
+			expected: true,
+		},
+		{
+			array:    []float64{0.0, 0.0, 0.0},
+			funcs:    []func(idx int, value float64, arr []float64) bool{},
+			expected: false,
+		},
+		{
+			array:    []float64{},
+			funcs:    []func(idx int, value float64, arr []float64) bool{},
+			expected: false,
+		},
+		{
+			array: []float64{1.0, 2.0, 3.0},
+			funcs: []func(idx int, value float64, arr []float64) bool{
+				func(idx int, value float64, arr []float64) bool {
+					return value == 0
+				},
+			},
+			expected: false,
+		},
+		{
+			array: []float64{1.0, 0.0, 2.0, 0.0},
+			funcs: []func(idx int, value float64, arr []float64) bool{
+				func(idx int, value float64, arr []float64) bool {
+					return value == 0
+				},
+				func(idx int, value float64, arr []float64) bool {
+					return value > 0
+				},
+			},
+			expected: false,
+		},
+	} {
+		actual := slices.All(test.array, test.funcs...)
+		if actual != test.expected {
+			t.Errorf("[]float64 no. %d (%v): Got %t, expected %t", testNo+1, test, actual, test.expected)
+		}
+	}
+}

@@ -67,6 +67,30 @@ func ExampleComprehension() {
 	// After: [0 2 6 12 20]
 }
 
+// Multiples each integer in each given array by their relative index within the joined array. The result of this
+// arithmetic will then be converted to the integer's string representation.
+func ExampleJoinedComprehension() {
+	intArrs := [][]int{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}
+	fmt.Println("Before:", intArrs)
+	fmt.Println("Before (joined):", Join(intArrs...))
+
+	strArr := JoinedComprehension[int, string](func(idx int, value int, arr []int) string {
+		return fmt.Sprintf("%d", idx*value)
+	}, intArrs...)
+	fmt.Println("After:", strArr)
+	// Output:
+	// Before: [[1 2 3] [4 5 6] [7 8 9]]
+	// Before (joined): [1 2 3 4 5 6 7 8 9]
+	// After: [0 2 6 12 20 30 42 56 72]
+}
+
+// Joins 3 lists of 3 elements each together into a new list of 9 elements.
+func ExampleJoin() {
+	fmt.Println(Join([]int{1, 2, 3}, []int{4, 5, 6}, []int{7, 8, 9}))
+	// Output:
+	// [1 2 3 4 5 6 7 8 9]
+}
+
 // Reverses a slice of integers in-place.
 func ExampleReverse() {
 	intArr := []int{1, 2, 3, 4, 5}
@@ -108,4 +132,61 @@ func ExampleFilter() {
 		))
 	// Output:
 	// square numbers (0-9): [1 4 9]
+}
+
+// Shows a few examples on how to use the Any function, and how the default evaluation functions change depending on the
+// type of the input array.
+func ExampleAny() {
+	checkStringLenEq10 := func(idx int, value string, arr []string) bool {
+		return len(value) == 10
+	}
+
+	checkStringEqB := func(idx int, value string, arr []string) bool {
+		return value == "b"
+	}
+
+	bools := []bool{false, true, false}
+	numbers := []uint32{0, 0, 1, 3}
+	strings := []string{"hello", "a", "world", "b"}
+	emptyStrings := []string{"", "", ""}
+	arrayOfArrays := [][]any{{}, {}, {1, 2, 3}}
+
+	fmt.Printf("Any(%v) = %t\n", bools, Any(bools))
+	fmt.Printf("Any(%v) = %t\n", numbers, Any(numbers))
+	fmt.Printf("Any(%v, checkStringLenEq10, checkStringEqB) = %t\n", strings, Any(strings, checkStringLenEq10, checkStringEqB))
+	fmt.Printf("Any(%v) = %t\n", emptyStrings, Any(emptyStrings))
+	fmt.Printf("Any(%v) = %t\n", arrayOfArrays, Any(arrayOfArrays))
+	// Output:
+	// Any([false true false]) = true
+	// Any([0 0 1 3]) = true
+	// Any([hello a world b], checkStringLenEq10, checkStringEqB) = true
+	// Any([  ]) = false
+	// Any([[] [] [1 2 3]]) = true
+}
+
+// Shows a few examples on how to use the All function, and how the default evaluation functions change depending on the
+// type of the input array.
+func ExampleAll() {
+	checkStringLenEq10 := func(idx int, value string, arr []string) bool {
+		return len(value) == 10
+	}
+
+	checkStringEqB := func(idx int, value string, arr []string) bool {
+		return value == "b"
+	}
+
+	bools := []bool{true, true, true}
+	numbers := []uint32{0, 0, 1, 3}
+	strings := []string{"helloworld", "b", "helloworld", "b"}
+	arrayOfArrays := [][]any{{1}, {1, 2}, {1, 2, 3}}
+
+	fmt.Printf("All(%v) = %t\n", bools, All(bools))
+	fmt.Printf("All(%v) = %t\n", numbers, All(numbers))
+	fmt.Printf("All(%v, checkStringLenEq10, checkStringEqB) = %t\n", strings, All(strings, checkStringLenEq10, checkStringEqB))
+	fmt.Printf("All(%v) = %t\n", arrayOfArrays, All(arrayOfArrays))
+	// Output:
+	// All([true true true]) = true
+	// All([0 0 1 3]) = false
+	// All([helloworld b helloworld b], checkStringLenEq10, checkStringEqB) = true
+	// All([[1] [1 2] [1 2 3]]) = true
 }
