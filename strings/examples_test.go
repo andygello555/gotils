@@ -1,7 +1,6 @@
 package strings
 
 import (
-	"container/heap"
 	"fmt"
 )
 
@@ -19,46 +18,6 @@ func ExampleReplaceCharIndexRange() {
 	fmt.Println(ReplaceCharIndexRange(old, [][]int{{6, 11}, {18, 21}, {22, 25}}, "me", "I", "am"))
 	// Output:
 	// Hello me! Hope I am having a good day today.
-}
-
-// How to create and use a StringHeap.
-//
-// Just uses the usual standard heap package functions.
-func ExampleStringHeap() {
-	// Create a StringHeap.
-	stringHeap := make(StringHeap, 0)
-	heap.Init(&stringHeap)
-
-	// Push some strings. Make sure to use heap.Push rather than stringHeap.Push.
-	heap.Push(&stringHeap, "Crisps")
-	heap.Push(&stringHeap, "Egg")
-	heap.Push(&stringHeap, "Bananas")
-	heap.Push(&stringHeap, "Doughnut")
-	heap.Push(&stringHeap, "Apple")
-	heap.Push(&stringHeap, "Fried chicken")
-	heap.Push(&stringHeap, "Orange")
-	heap.Push(&stringHeap, "Grapefruit")
-
-	// We can get the length using stringHeap.Len.
-	fmt.Println("Length before:", stringHeap.Len())
-
-	// Pop them off.
-	for stringHeap.Len() > 0 {
-		fmt.Println(heap.Pop(&stringHeap).(string))
-	}
-
-	fmt.Println("Length after:", stringHeap.Len())
-	// Output:
-	// Length before: 8
-	// Apple
-	// Bananas
-	// Crisps
-	// Doughnut
-	// Egg
-	// Fried chicken
-	// Grapefruit
-	// Orange
-	// Length after: 0
 }
 
 // Get the type name of a string then nil.

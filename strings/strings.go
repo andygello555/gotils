@@ -18,37 +18,6 @@ const (
 	AlphaNumeric = Alpha + Numeric
 )
 
-// StringHeap is a priority queue which sorts strings lexicographically.
-type StringHeap []string
-
-// Len gives the length of the StringHeap.
-func (spq StringHeap) Len() int { return len(spq) }
-
-// Less compares two string elements in the StringHeap.
-//
-// Uses strings.Compare internally.
-func (spq StringHeap) Less(i, j int) bool {
-	// We want Pop to give us the highest, not lowest, priority so we use greater than here.
-	return strings.Compare(spq[i], spq[j]) <= 0
-}
-
-// Swap swaps the two elements indicated via the given indices.
-func (spq StringHeap) Swap(i, j int) { spq[i], spq[j] = spq[j], spq[i] }
-
-// Push pushes the given any to the heap.
-//
-// Will panic if given any is not a string.
-func (spq *StringHeap) Push(x any) { *spq = append(*spq, x.(string)) }
-
-// Pop pops the tail of the queue.
-func (spq *StringHeap) Pop() any {
-	old := *spq
-	n := len(old)
-	str := old[n-1]
-	*spq = old[0 : n-1]
-	return str
-}
-
 // StripWhitespace will strip all whitespace from a given string and return a new string without any whitespace.
 func StripWhitespace(str string) string {
 	var b strings.Builder
