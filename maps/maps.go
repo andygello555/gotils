@@ -26,8 +26,8 @@ func CopyMap(m map[string]any) map[string]any {
 	return cp
 }
 
-// MapRangeFunc is the signature passed to RangeOrderedKeys. It is passed the key-value pair, and should return whether
-// you want to keep iterating over the map.
+// MapRangeFunc is the signature passed to RangeKeys, and RangeOrderedKeys. It is passed the key-value pair, and
+// should return whether you want to keep iterating over the map.
 type MapRangeFunc[K comparable, V any] func(i int, key K, val V) bool
 
 // RangeOrderedKeys calls the given MapRangeFunc on each index-key-value triple. Triples are ordered by their keys.
@@ -42,7 +42,7 @@ func RangeOrderedKeys[K constraints.Ordered, V any](m map[K]V, fun MapRangeFunc[
 	for keys.Len() > 0 {
 		key := heap.Pop(&keys).(K)
 		val := m[key]
-		if cont := fun(i, key, val); !cont {
+		if !fun(i, key, val) {
 			break
 		}
 		i++
@@ -53,7 +53,7 @@ func RangeOrderedKeys[K constraints.Ordered, V any](m map[K]V, fun MapRangeFunc[
 func RangeKeys[K comparable, V any](m map[K]V, fun MapRangeFunc[K, V]) {
 	i := 0
 	for key, val := range m {
-		if cont := fun(i, key, val); !cont {
+		if !fun(i, key, val) {
 			break
 		}
 		i++
@@ -90,6 +90,31 @@ func Values[K comparable, V any](m map[K]V) []V {
 		i++
 	}
 	return values
+}
+
+// Filter takes a map and runs the given predicate function on each index-key-value triple. If the predicate
+// returns false for an element, then that element will be removed from the given map.
+func Filter[K comparable, V any](m map[K]V, fun func(i int, key K, val V) bool) {
+	i := 0
+	for key, val := range m {
+		if !fun(i, key, val) {
+			delete(m, key)
+		}
+	}
+}
+
+// Union takes merges the source map into the destination map, overriding any matching keys.
+func Union[K comparable, V any](dst map[K]V, src map[K]V) {
+	for key, val := range src {
+		dst[key] = val
+	}
+}
+
+// Difference removes every key-value pair in m that also exists in n.
+func Difference[K comparable, V any](m map[K]V, n map[K]V) {
+	for key := range n {
+		delete(m, key)
+	}
 }
 
 // JsonMapEqualTest used in tests to check equality between two anys.

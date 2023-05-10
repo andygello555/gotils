@@ -82,13 +82,13 @@ func ExampleRangeKeys() {
 		"c": 3,
 	}
 	RangeKeys(m, func(i int, key string, val int) bool {
-		fmt.Printf("%d-%s-%d\n", i, key, val)
+		fmt.Printf("%s-%d\n", key, val)
 		return true
 	})
-	// Output:
-	// 0-a-1
-	// 1-b-2
-	// 2-c-3
+	// Unordered output:
+	// a-1
+	// b-2
+	// c-3
 }
 
 // Range over a map, in key order, and display the index, key, and value of the current key-value pair.
@@ -106,4 +106,55 @@ func ExampleRangeOrderedKeys() {
 	// 0-a-1
 	// 1-b-2
 	// 2-c-3
+}
+
+// Filter out all key-value pairs for a map of strings to integers whose values are <= 2.
+func ExampleFilter() {
+	m := map[string]int{
+		"a": 1,
+		"b": 2,
+		"c": 3,
+	}
+	Filter(m, func(i int, key string, val int) bool {
+		return val > 2
+	})
+	fmt.Println(m)
+	// Output:
+	// map[c:3]
+}
+
+// Union two maps together, storing the result in the first map.
+func ExampleUnion() {
+	m := map[string]int{
+		"a": 1,
+		"b": 2,
+		"c": 3,
+	}
+	n := map[string]int{
+		"c": 4,
+		"d": 5,
+		"e": 6,
+	}
+	Union(m, n)
+	fmt.Println(m)
+	// Output:
+	// map[a:1 b:2 c:4 d:5 e:6]
+}
+
+// Find the difference of two maps, storing the difference in the first map.
+func ExampleDifference() {
+	m := map[string]int{
+		"a": 1,
+		"b": 2,
+		"c": 3,
+	}
+	n := map[string]int{
+		"a": 4,
+		"b": 5,
+		"d": 6,
+	}
+	Difference(m, n)
+	fmt.Println(m)
+	// Output:
+	// map[c:3]
 }
