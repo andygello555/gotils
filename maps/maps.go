@@ -100,7 +100,21 @@ func Filter[K comparable, V any](m map[K]V, fun func(i int, key K, val V) bool) 
 		if !fun(i, key, val) {
 			delete(m, key)
 		}
+		i++
 	}
+}
+
+// FilterNew works similarly to Filter except it returns a new map.
+func FilterNew[K comparable, V any](m map[K]V, fun func(i int, key K, val V) bool) map[K]V {
+	i := 0
+	n := make(map[K]V)
+	for key, val := range m {
+		if fun(i, key, val) {
+			n[key] = val
+		}
+		i++
+	}
+	return n
 }
 
 // Union takes merges the source map into the destination map, overriding any matching keys.
@@ -110,11 +124,31 @@ func Union[K comparable, V any](dst map[K]V, src map[K]V) {
 	}
 }
 
+// UnionNew works similarly to Union expect it returns a new map.
+func UnionNew[K comparable, V any](m map[K]V, n map[K]V) map[K]V {
+	o := make(map[K]V)
+	for key, val := range m {
+		o[key] = val
+	}
+	Union(o, n)
+	return o
+}
+
 // Difference removes every key-value pair in m that also exists in n.
 func Difference[K comparable, V any](m map[K]V, n map[K]V) {
 	for key := range n {
 		delete(m, key)
 	}
+}
+
+// DifferenceNew works similarly to Difference expect it returns a new map.
+func DifferenceNew[K comparable, V any](m map[K]V, n map[K]V) map[K]V {
+	o := make(map[K]V)
+	for key, val := range m {
+		o[key] = val
+	}
+	Difference(o, n)
+	return o
 }
 
 // JsonMapEqualTest used in tests to check equality between two anys.
