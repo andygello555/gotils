@@ -1,8 +1,13 @@
 package tests
 
 import (
+	"fmt"
+	"github.com/andygello555/gotils/v2/numbers"
 	"github.com/andygello555/gotils/v2/slices"
+	"math"
+	"math/rand"
 	"reflect"
+	"sort"
 	"testing"
 )
 
@@ -795,5 +800,96 @@ func TestAll(t *testing.T) {
 		if actual != test.expected {
 			t.Errorf("[]float64 no. %d (%v): Got %t, expected %t", testNo+1, test, actual, test.expected)
 		}
+	}
+}
+
+type orderTestCase[E any] struct {
+	desc string
+	in   []E
+	out  []E
+}
+
+func testOrder[E any](t *testing.T, testCase orderTestCase[E]) {
+	t.Helper()
+	t.Run(testCase.desc, func(t *testing.T) {
+		slices.Order(testCase.in)
+		if !reflect.DeepEqual(testCase.in, testCase.out) {
+			t.Errorf("got %v, want %v", testCase.in, testCase.out)
+		}
+	})
+}
+
+func generateCases[E any](generateOrdered func() []E, checkSorted func(s []E) bool) []orderTestCase[E] {
+	name := fmt.Sprintf("%T", *new(E))
+	oa := generateOrdered()
+	oa1 := make([]E, 1)
+	copy(oa1, oa)
+	oa3 := make([]E, 3)
+	copy(oa3, oa)
+	ua := make([]E, len(oa))
+	copy(ua, oa)
+	for checkSorted(ua) {
+		rand.Shuffle(len(ua), func(i, j int) { ua[i], ua[j] = ua[j], ua[i] })
+	}
+
+	return []orderTestCase[E]{
+		{fmt.Sprintf("empty %s array", name), []E{}, []E{}},
+		{fmt.Sprintf("singleton %s array", name), oa1, oa1},
+		{fmt.Sprintf("ordered %s array", name), oa3, oa3},
+		{fmt.Sprintf("unordered %s array of %d elements", name, len(ua)), ua, oa},
+	}
+}
+
+func TestOrder(t *testing.T) {
+	const unorderedArraySize = 50
+
+	for _, test := range generateCases[int](func() []int {
+		return numbers.Range(1, unorderedArraySize, 1)
+	}, func(s []int) bool {
+		return sort.IntsAreSorted(s)
+	}) {
+		testOrder(t, test)
+	}
+
+	for _, test := range generateCases[float64](func() []float64 {
+		return numbers.Range(1.0, float64(unorderedArraySize), 1.0)
+	}, func(s []float64) bool {
+		return sort.Float64sAreSorted(s)
+	}) {
+		testOrder(t, test)
+	}
+
+	integerPadFormat := fmt.Sprintf("%%0%dd", int(math.Floor(math.Log10(float64(unorderedArraySize))+1.0)))
+	for _, test := range generateCases[string](func() []string {
+		return slices.Comprehension(numbers.Range(1, unorderedArraySize, 1), func(idx int, value int, arr []int) string {
+			return fmt.Sprintf(integerPadFormat, value)
+		})
+	}, func(s []string) bool {
+		return sort.StringsAreSorted(s)
+	}) {
+		testOrder(t, test)
+	}
+
+	type intString string
+	for _, test := range generateCases[intString](func() []intString {
+		return slices.Comprehension(numbers.Range(1, unorderedArraySize, 1), func(idx int, value int, arr []int) intString {
+			return intString(fmt.Sprintf(integerPadFormat, value))
+		})
+	}, func(s []intString) bool {
+		return sort.StringsAreSorted(slices.Comprehension(s, func(idx int, value intString, arr []intString) string {
+			return string(value)
+		}))
+	}) {
+		testOrder(t, test)
+	}
+
+	for _, test := range generateCases[bool](func() []bool {
+		return slices.Comprehension[int, bool](numbers.Range(1, unorderedArraySize, 1), func(idx int, value int, arr []int) bool {
+			return idx%2 == 0
+		})
+	}, func(s []bool) bool {
+		return false
+	}) {
+		testOrder(t, test)
 	}
 }

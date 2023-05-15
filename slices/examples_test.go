@@ -190,3 +190,26 @@ func ExampleAll() {
 	// All([helloworld b helloworld b], checkStringLenEq10, checkStringEqB) = true
 	// All([[1] [1 2] [1 2 3]]) = true
 }
+
+// Orders a few different types of slices that can be ordered, as well as showcasing what happens when a slice cannot be
+// ordered.
+func ExampleOrder() {
+	a := []uint8{4, 2, 1, 3}
+	Order(a)
+	b := []float32{3.142, 1.23, 2.222, 4.0}
+	Order(b)
+	c := []string{"3", "4", "2", "1"}
+	Order(c)
+	d := []bool{false, true}
+	Order(d)
+
+	fmt.Println("a:", a)
+	fmt.Println("b:", b)
+	fmt.Println("c:", c)
+	fmt.Println("d:", d)
+	// Output:
+	// a: [1 2 3 4]
+	// b: [1.23 2.222 3.142 4]
+	// c: [1 2 3 4]
+	// d: [false true]
+}

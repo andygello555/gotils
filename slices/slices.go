@@ -329,3 +329,62 @@ func All[E any](s []E, funcs ...func(idx int, value E, arr []E) bool) bool {
 func JoinedAll[E any](funcs []func(idx int, value E, arr []E) bool, ss ...[]E) bool {
 	return All(Join(ss...), funcs...)
 }
+
+type twoSlices[E any] struct {
+	values []reflect.Value
+	s      []E
+	less   func(a, b reflect.Value) bool
+}
+
+func (t twoSlices[E]) Len() int { return numbers.Min(len(t.s), len(t.values)) }
+
+func (t twoSlices[E]) Less(i, j int) bool {
+	if t.less == nil {
+		return false
+	}
+	return t.less(t.values[i], t.values[j])
+}
+
+func (t twoSlices[E]) Swap(i, j int) {
+	t.values[i], t.values[j] = t.values[j], t.values[i]
+	t.s[i], t.s[j] = t.s[j], t.s[i]
+}
+
+func newTwoSlices[E any](s []E) twoSlices[E] {
+	ts := twoSlices[E]{s: s}
+	eType := reflect.TypeOf(new(E)).Elem()
+	switch eType.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		ts.less = func(a, b reflect.Value) bool { return a.Int() < b.Int() }
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		ts.less = func(a, b reflect.Value) bool { return a.Uint() < b.Uint() }
+	case reflect.Float32, reflect.Float64:
+		ts.less = func(a, b reflect.Value) bool { return a.Float() < b.Float() }
+	case reflect.String:
+		ts.less = func(a, b reflect.Value) bool { return a.String() < b.String() }
+	default:
+		ts.less = nil
+	}
+
+	if ts.less != nil {
+		ts.values = Comprehension(s, func(idx int, value E, arr []E) reflect.Value {
+			return reflect.ValueOf(value)
+		})
+	}
+	return ts
+}
+
+// Order will order any slice of elements that can be ordered (integers, floats, and strings) in place.
+//
+// It is useful for sorting arrays whose elements are constraints.Ordered. The reason why we accept a slice with any
+// element type is for completeness: a slice whose elements are unordered will be left untouched/the order is preserved.
+//
+// Order incurs quite a lot more overhead than a call to sort.Slice or sort.Sort, as the entire array first needs to be
+// converted to reflect.Value(s). Then sort.Sort will be called, sorting both the array of reflect.Value and the input
+// slice at the same time.
+func Order[E any](s []E) {
+	ts := newTwoSlices(s)
+	if ts.less != nil {
+		sort.Sort(ts)
+	}
+}
