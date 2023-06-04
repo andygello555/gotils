@@ -202,14 +202,36 @@ func ExampleOrder() {
 	Order(c)
 	d := []bool{false, true}
 	Order(d)
+	e := []struct {
+		X int
+	}{
+		{3},
+		{1},
+		{2},
+		{5},
+		{4},
+	}
+	Order(e)
+	f := [][]int{
+		{3, 4},
+		{2, 3},
+		{1, 2},
+		{5, 6},
+		{4, 5},
+	}
+	Order(f)
 
 	fmt.Println("a:", a)
 	fmt.Println("b:", b)
 	fmt.Println("c:", c)
 	fmt.Println("d:", d)
+	fmt.Println("e:", e)
+	fmt.Println("f:", f)
 	// Output:
 	// a: [1 2 3 4]
 	// b: [1.23 2.222 3.142 4]
 	// c: [1 2 3 4]
 	// d: [false true]
+	// e: [{1} {2} {3} {4} {5}]
+	// f: [[1 2] [2 3] [3 4] [4 5] [5 6]]
 }

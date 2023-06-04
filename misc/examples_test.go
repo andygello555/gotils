@@ -22,3 +22,14 @@ func ExampleIsEmailValid() {
 	// test@example.com is a valid email
 	// not a valid email
 }
+
+// Compare some constraints.Ordered values!
+func ExampleCompare() {
+	fmt.Printf("Compare(1, 2) = %s\n", Compare(1, 2))
+	fmt.Printf("Compare(1.23, 1.23) = %s\n", Compare(1.23, 1.23))
+	fmt.Printf("Compare(\"world\", \"hello\") = %s\n", Compare("world", "hello"))
+	// Output:
+	// Compare(1, 2) = Less
+	// Compare(1.23, 1.23) = Equal
+	// Compare("world", "hello") = Greater
+}

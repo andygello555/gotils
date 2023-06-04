@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"reflect"
 	"sort"
+	"strings"
 	"testing"
 )
 
@@ -819,8 +820,14 @@ func testOrder[E any](t *testing.T, testCase orderTestCase[E]) {
 	})
 }
 
-func generateCases[E any](generateOrdered func() []E, checkSorted func(s []E) bool) []orderTestCase[E] {
-	name := fmt.Sprintf("%T", *new(E))
+func generateCases[E any](generateOrdered func() []E, checkSorted func(s []E) bool, suffixes ...string) []orderTestCase[E] {
+	var b strings.Builder
+	b.WriteString(fmt.Sprintf("%T", *new(E)))
+	for _, suffix := range suffixes {
+		b.WriteString(" " + suffix)
+	}
+	name := b.String()
+
 	oa := generateOrdered()
 	oa1 := make([]E, 1)
 	copy(oa1, oa)
@@ -891,5 +898,161 @@ func TestOrder(t *testing.T) {
 		return false
 	}) {
 		testOrder(t, test)
+	}
+
+	type all struct {
+		X int
+		Y float64
+		Z string
+	}
+
+	for _, generator := range []struct {
+		suffixes []string
+		fun      func(idx int, value int, arr []int) all
+	}{
+		{
+			suffixes: []string{"all", "components", "differ"},
+			fun: func(idx int, value int, arr []int) all {
+				return all{
+					X: value,
+					Y: float64(value + 1),
+					Z: fmt.Sprintf(integerPadFormat, value+2),
+				}
+			},
+		},
+		{
+			suffixes: []string{"second", "component", "differs"},
+			fun: func(idx int, value int, arr []int) all {
+				return all{
+					X: 0,
+					Y: float64(value),
+					Z: fmt.Sprintf(integerPadFormat, value+1),
+				}
+			},
+		},
+		{
+			suffixes: []string{"third", "component", "differs"},
+			fun: func(idx int, value int, arr []int) all {
+				return all{
+					X: 0,
+					Y: 0.0,
+					Z: fmt.Sprintf(integerPadFormat, value),
+				}
+			},
+		},
+		{
+			suffixes: []string{"all", "components", "equal"},
+			fun: func(idx int, value int, arr []int) all {
+				return all{}
+			},
+		},
+	} {
+		for _, test := range generateCases[all](func() []all {
+			return slices.Comprehension[int, all](numbers.Range(1, unorderedArraySize, 1), generator.fun)
+		}, func(s []all) bool { return false }, generator.suffixes...) {
+			testOrder(t, test)
+		}
+	}
+
+	type compound struct {
+		X all
+		Y *all
+		Z []all
+	}
+
+	for _, generator := range []struct {
+		suffixes []string
+		fun      func(idx int, value int, arr []int) compound
+	}{
+		{
+			suffixes: []string{"all", "components", "differ"},
+			fun: func(idx int, value int, arr []int) compound {
+				return compound{
+					X: all{
+						X: value,
+						Y: float64(value + 1),
+						Z: fmt.Sprintf(integerPadFormat, value+2),
+					},
+					Y: &all{
+						X: value + 3,
+						Y: float64(value + 4),
+						Z: fmt.Sprintf(integerPadFormat, value+5),
+					},
+					Z: []all{
+						{value + 6, float64(value + 7), fmt.Sprintf(integerPadFormat, value+8)},
+						{value + 9, float64(value + 10), fmt.Sprintf(integerPadFormat, value+11)},
+						{value + 12, float64(value + 13), fmt.Sprintf(integerPadFormat, value+14)},
+					},
+				}
+			},
+		},
+		{
+			suffixes: []string{"second", "component", "differs"},
+			fun: func(idx int, value int, arr []int) compound {
+				return compound{
+					X: all{},
+					Y: &all{
+						X: value,
+						Y: float64(value + 1),
+						Z: fmt.Sprintf(integerPadFormat, value+2),
+					},
+					Z: []all{
+						{value + 3, float64(value + 4), fmt.Sprintf(integerPadFormat, value+5)},
+						{value + 6, float64(value + 7), fmt.Sprintf(integerPadFormat, value+8)},
+						{value + 9, float64(value + 10), fmt.Sprintf(integerPadFormat, value+11)},
+					},
+				}
+			},
+		},
+		{
+			suffixes: []string{"third", "component", "differs"},
+			fun: func(idx int, value int, arr []int) compound {
+				return compound{
+					X: all{},
+					Y: &all{},
+					Z: []all{
+						{value, float64(value + 1), fmt.Sprintf(integerPadFormat, value+2)},
+						{value + 3, float64(value + 4), fmt.Sprintf(integerPadFormat, value+5)},
+						{value + 6, float64(value + 7), fmt.Sprintf(integerPadFormat, value+8)},
+					},
+				}
+			},
+		},
+	} {
+		for _, test := range generateCases[compound](func() []compound {
+			return slices.Comprehension(numbers.Range(1, unorderedArraySize, 1), generator.fun)
+		}, func(s []compound) bool { return false }, generator.suffixes...) {
+			testOrder(t, test)
+		}
+	}
+
+	for _, generator := range []struct {
+		suffixes []string
+		fun      func(idx int, value int, arr []int) []int
+	}{
+		{
+			suffixes: []string{"all", "elements", "differ"},
+			fun: func(idx int, value int, arr []int) []int {
+				return []int{value, value + 1, value + 2}
+			},
+		},
+		{
+			suffixes: []string{"second", "element", "differs"},
+			fun: func(idx int, value int, arr []int) []int {
+				return []int{0, value, value + 1}
+			},
+		},
+		{
+			suffixes: []string{"third", "element", "differs"},
+			fun: func(idx int, value int, arr []int) []int {
+				return []int{0, 0, value}
+			},
+		},
+	} {
+		for _, test := range generateCases[[]int](func() [][]int {
+			return slices.Comprehension(numbers.Range(1, unorderedArraySize, 1), generator.fun)
+		}, func(s [][]int) bool { return false }, generator.suffixes...) {
+			testOrder(t, test)
+		}
 	}
 }

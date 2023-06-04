@@ -1,7 +1,11 @@
 // Package misc contains some miscellaneous functions and constants that don't really fit elsewhere.
 package misc
 
-import "regexp"
+import (
+	"fmt"
+	"golang.org/x/exp/constraints"
+	"regexp"
+)
 
 var (
 	// EmailValidation (const)
@@ -16,4 +20,40 @@ func IsEmailValid(email string) bool {
 		return false
 	}
 	return EmailValidation.MatchString(email)
+}
+
+type Ordered int
+
+const (
+	Less    Ordered = -1
+	Equal   Ordered = 0
+	Greater Ordered = 1
+)
+
+func (o Ordered) String() string {
+	switch o {
+	case Less:
+		return "Less"
+	case Equal:
+		return "Equal"
+	case Greater:
+		return "Greater"
+	default:
+		return fmt.Sprintf("%d", o)
+	}
+}
+
+// Compare compares the two constraints.Ordered values and returns:
+//   - Less: a < b
+//   - Equal: a == b
+//   - Greater: a > b
+func Compare[V constraints.Ordered](a, b V) Ordered {
+	switch {
+	case a < b:
+		return Less
+	case a == b:
+		return Equal
+	default:
+		return Greater
+	}
 }

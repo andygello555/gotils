@@ -3,6 +3,7 @@ package slices
 
 import (
 	"fmt"
+	"github.com/andygello555/gotils/v2/misc"
 	"github.com/andygello555/gotils/v2/numbers"
 	"reflect"
 	"sort"
@@ -350,34 +351,140 @@ func (t twoSlices[E]) Swap(i, j int) {
 	t.s[i], t.s[j] = t.s[j], t.s[i]
 }
 
+func compoundLen(a reflect.Value) int {
+	switch a.Kind() {
+	case reflect.Array, reflect.Slice:
+		return a.Len()
+	case reflect.Struct:
+		return a.NumField()
+	default:
+		return 0
+	}
+}
+
+func compoundIndex(a reflect.Value, i int) reflect.Value {
+	switch a.Kind() {
+	case reflect.Array, reflect.Slice:
+		return a.Index(i)
+	case reflect.Struct:
+		return a.Field(i)
+	default:
+		return a
+	}
+}
+
+func orderCompound(a, b reflect.Value) misc.Ordered {
+	aLen, bLen := compoundLen(a), compoundLen(b)
+	for i := 0; i < numbers.Min(aLen, bLen); i++ {
+		aEl, bEl := compoundIndex(a, i), compoundIndex(b, i)
+		if aEl.Type() != bEl.Type() || aEl.Kind() != bEl.Kind() {
+			continue
+		}
+
+		for {
+			switch aEl.Kind() {
+			case reflect.Ptr, reflect.Interface:
+				aEl, bEl = aEl.Elem(), bEl.Elem()
+				continue
+			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+				if aInt, bInt := aEl.Int(), bEl.Int(); aInt != bInt {
+					return misc.Compare(aEl.Int(), bEl.Int())
+				}
+			case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+				if aUint, bUint := aEl.Uint(), bEl.Uint(); aUint != bUint {
+					return misc.Compare(aEl.Uint(), bEl.Uint())
+				}
+			case reflect.Float32, reflect.Float64:
+				if aFloat, bFloat := aEl.Float(), bEl.Float(); aFloat != bFloat {
+					return misc.Compare(aEl.Float(), bEl.Float())
+				}
+			case reflect.String:
+				if aString, bString := aEl.String(), bEl.String(); aString != bString {
+					return misc.Compare(aEl.String(), bEl.String())
+				}
+			case reflect.Array, reflect.Slice, reflect.Struct:
+				if o := orderCompound(aEl, bEl); o != misc.Equal {
+					return o
+				}
+			}
+			break
+		}
+	}
+	return misc.Compare(aLen, bLen)
+}
+
 func newTwoSlices[E any](s []E) twoSlices[E] {
 	ts := twoSlices[E]{s: s}
 	eType := reflect.TypeOf(new(E)).Elem()
-	switch eType.Kind() {
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		ts.less = func(a, b reflect.Value) bool { return a.Int() < b.Int() }
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		ts.less = func(a, b reflect.Value) bool { return a.Uint() < b.Uint() }
-	case reflect.Float32, reflect.Float64:
-		ts.less = func(a, b reflect.Value) bool { return a.Float() < b.Float() }
-	case reflect.String:
-		ts.less = func(a, b reflect.Value) bool { return a.String() < b.String() }
-	default:
-		ts.less = nil
+	for {
+		switch eType.Kind() {
+		case reflect.Ptr, reflect.Interface:
+			eType = eType.Elem()
+			continue
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			ts.less = func(a, b reflect.Value) bool { return a.Int() < b.Int() }
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			ts.less = func(a, b reflect.Value) bool { return a.Uint() < b.Uint() }
+		case reflect.Float32, reflect.Float64:
+			ts.less = func(a, b reflect.Value) bool { return a.Float() < b.Float() }
+		case reflect.String:
+			ts.less = func(a, b reflect.Value) bool { return a.String() < b.String() }
+		case reflect.Struct:
+			ts.less = func(a, b reflect.Value) bool {
+				return orderCompound(a, b) == misc.Less
+			}
+		case reflect.Array, reflect.Slice:
+			ts.less = func(a, b reflect.Value) bool {
+				return orderCompound(a, b) == misc.Less
+			}
+		default:
+			ts.less = nil
+		}
+		break
 	}
 
 	if ts.less != nil {
 		ts.values = Comprehension(s, func(idx int, value E, arr []E) reflect.Value {
-			return reflect.ValueOf(value)
+			v := reflect.ValueOf(value)
+			for v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface {
+				v = v.Elem()
+			}
+			return v
 		})
 	}
 	return ts
 }
 
-// Order will order any slice of elements that can be ordered (integers, floats, and strings) in place.
+// Order will order any slice of elements that can be ordered (integers, floats, and strings), as well as structs and
+// arrays/slices, in place.
 //
 // It is useful for sorting arrays whose elements are constraints.Ordered. The reason why we accept a slice with any
 // element type is for completeness: a slice whose elements are unordered will be left untouched/the order is preserved.
+//
+// Structs are ordered lexicographically. When given instances of a struct of type A and a struct of type B the fields
+// of each struct are both iterated up until minimum of A.NumFields() and B.NumFields().
+//   - If the fields' types are pointer/interface types then they're iteratively dereferenced until they are not.
+//   - If the fields' types are not the same then they are skipped.
+//   - If the fields' types are constraints.Ordered, and the values of them are found not to be equal: A field's value
+//     is compared with B field's value and the result is returned. If they are equal then the next field is checked.
+//     Fields that are Struct, Array, and Slice types are recursively compared. Try to avoid this, as this takes a lot
+//     of reflection.
+//   - If the fields' types are not constraints.Ordered, they are skipped.
+//
+// If iteration has finished without a return, then the number of fields for A and B are compared and returned.
+//
+// Arrays/slices are also ordered lexicographically in a similar way to Structs. Given an instance A of an array/slice
+// type and an instance B of an array/slice type, the elements of each array/slice are iterated up until the minimum of
+// A.Len() and B.Len().
+//   - If the elements' types are pointer/interface types then they're iteratively dereferenced until they are not.
+//   - If the elements' types are not the same then they are skipped
+//   - If the elements' types are constraints.Ordered, and the values of them are found not to be equal: A element's
+//     value is compared with B element's value and the result is returned. If they are equal, then the next element is
+//     checked. Elements that are Struct, Array, and Slice types are recursively compared. Try to avoid this, as this
+//     takes a lot of reflection.
+//   - If the elements' types are not constraints.Ordered, they are skipped.
+//
+// If iteration has finished without a return, then the number of elements for A and B are compared and returned.
 //
 // Order incurs quite a lot more overhead than a call to sort.Slice or sort.Sort, as the entire array first needs to be
 // converted to reflect.Value(s). Then sort.Sort will be called, sorting both the array of reflect.Value and the input
